@@ -1,0 +1,37 @@
+.App {
+  min-height: 100vh;
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
+
+.App-link {
+  color: #064E3B;
+  text-decoration: none;
+}
+
+.glassmorphism {
+  backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.ats-gauge {
+  position: relative;
+  width: 200px;
+  height: 100px;
+}
+
+.score-animation {
+  animation: scoreCount 2s ease-out forwards;
+}
+
+@keyframes scoreCount {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
