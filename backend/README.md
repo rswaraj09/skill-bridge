@@ -23,13 +23,6 @@ npm install
 
 Create a `.env` file in the backend folder:
 
-```
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/skill-bridge?retryWrites=true&w=majority
-JWT_SECRET=your_jwt_secret_key_here_make_it_long_and_random
-JWT_EXPIRE=7d
-PORT=5000
-FRONTEND_URL=http://localhost:3000
-```
 
 **To get MongoDB URI:**
 1. Create a MongoDB Atlas account at https://www.mongodb.com/cloud/atlas
