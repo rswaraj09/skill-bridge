@@ -8,34 +8,52 @@ import { Label } from '../components/ui/label';
 import { Progress } from '../components/ui/progress';
 import { resumeService } from '../services/api';
 import { toast } from 'sonner';
-import { Loader2, Target, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
+import { Loader2, Target, CheckCircle2, XCircle, TrendingUp, Upload } from 'lucide-react';
 
 export default function JobMatch() {
-  const [resumeContent, setResumeContent] = useState('');
+  const [resumeFile, setResumeFile] = useState(null);
+  const [resumeFileName, setResumeFileName] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      if (selectedFile.type === 'application/pdf' || selectedFile.type === 'text/plain' || selectedFile.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        setResumeFile(selectedFile);
+        setResumeFileName(selectedFile.name);
+        toast.success('Resume file selected');
+      } else {
+        toast.error('Please upload a PDF, TXT, or DOCX file');
+        setResumeFile(null);
+        setResumeFileName('');
+      }
+    }
+  };
+
   const handleMatch = async () => {
-    if (!resumeContent.trim() || !jobDescription.trim()) {
-      toast.error('Please provide both resume and job description');
+    if (!resumeFile || !jobDescription.trim()) {
+      toast.error('Please upload resume and provide job description');
       return;
     }
     setLoading(true);
     try {
-      const response = await resumeService.matchJob(resumeContent, jobDescription);
-      setResult(response.data);
+      const response = await resumeService.matchJobFile(resumeFile, jobDescription);
+      const matchData = response.data.data || response.data;
+      setResult(matchData);
       toast.success('Match analysis complete!');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Match analysis failed');
+      toast.error(error.response?.data?.message || 'Match analysis failed');
     } finally {
       setLoading(false);
     }
   };
 
   const getMatchColor = (percentage) => {
-    if (percentage >= 80) return 'text-green-600';
-    if (percentage >= 60) return 'text-yellow-600';
+    const numPercentage = typeof percentage === 'number' ? percentage : parseInt(percentage) || 0;
+    if (numPercentage >= 80) return 'text-green-600';
+    if (numPercentage >= 60) return 'text-yellow-600';
     return 'text-red-600';
   };
 
@@ -60,14 +78,28 @@ export default function JobMatch() {
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
             <Card className="p-6" data-testid="resume-input-card">
               <Label htmlFor="resume">Your Resume</Label>
-              <Textarea
-                id="resume"
-                placeholder="Paste your resume content..."
-                value={resumeContent}
-                onChange={(e) => setResumeContent(e.target.value)}
-                className="mt-2 min-h-[300px] font-mono text-sm"
-                data-testid="resume-input"
-              />
+              <div className="mt-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
+                <input
+                  id="resume"
+                  type="file"
+                  accept=".pdf,.txt,.docx"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  data-testid="resume-file-input"
+                />
+                <label htmlFor="resume" className="cursor-pointer flex flex-col items-center gap-3">
+                  <Upload className="w-12 h-12 text-muted-foreground" />
+                  <div>
+                    <p className="font-semibold text-foreground">Click to upload or drag and drop</p>
+                    <p className="text-sm text-muted-foreground mt-1">PDF, TXT, or DOCX (Max 5MB)</p>
+                  </div>
+                  {resumeFileName && (
+                    <p className="text-sm text-green-600 font-medium mt-2">
+                      ✓ {resumeFileName}
+                    </p>
+                  )}
+                </label>
+              </div>
             </Card>
             <Card className="p-6" data-testid="job-input-card">
               <Label htmlFor="job">Job Description</Label>
@@ -113,10 +145,10 @@ export default function JobMatch() {
                 <div className="space-y-8">
                   <div className="text-center" data-testid="match-percentage-display">
                     <div className={`text-6xl font-heading font-bold mb-2 ${getMatchColor(result.match_percentage)}`}>
-                      {Math.round(result.match_percentage)}%
+                      {result.match_percentage && !isNaN(result.match_percentage) ? Math.round(result.match_percentage) : '—'}%
                     </div>
                     <p className="text-muted-foreground mb-4">Match Percentage</p>
-                    <Progress value={result.match_percentage} className="h-2" />
+                    <Progress value={result.match_percentage && !isNaN(result.match_percentage) ? result.match_percentage : 0} className="h-2" />
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">

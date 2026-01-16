@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
 export const API = `${BACKEND_URL}/api`;
 
 export const api = axios.create({
@@ -51,11 +51,30 @@ export const resumeService = {
     formData.append('resume_content', content);
     return api.post('/resumes/analyze', formData);
   },
+  analyzeFile: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/resumes/analyze-file', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
   matchJob: (resumeContent, jobDescription) => {
     const formData = new FormData();
     formData.append('resume_content', resumeContent);
     formData.append('job_description', jobDescription);
     return api.post('/resumes/match-job', formData);
+  },
+  matchJobFile: (file, jobDescription) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('job_description', jobDescription);
+    return api.post('/resumes/match-job-file', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   },
   rewrite: (content, tone = 'professional') =>
     api.post('/resumes/rewrite', { resume_content: content, tone }),

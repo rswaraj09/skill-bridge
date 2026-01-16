@@ -1,40 +1,61 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { Progress } from '../components/ui/progress';
 import { resumeService } from '../services/api';
 import { toast } from 'sonner';
-import { Loader2, FileText, CheckCircle, XCircle, Lightbulb } from 'lucide-react';
+import { Loader2, FileText, CheckCircle, XCircle, Lightbulb, Upload } from 'lucide-react';
 
 export default function ResumeAnalyzer() {
-  const [content, setContent] = useState('');
+  const navigate = useNavigate();
+  const [file, setFile] = useState(null);
+  const [fileName, setFileName] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      if (selectedFile.type === 'application/pdf' || selectedFile.type === 'text/plain' || selectedFile.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        setFile(selectedFile);
+        setFileName(selectedFile.name);
+        toast.success('File selected successfully');
+      } else {
+        toast.error('Please upload a PDF, TXT, or DOCX file');
+        setFile(null);
+        setFileName('');
+      }
+    }
+  };
+
   const handleAnalyze = async () => {
-    if (!content.trim()) {
-      toast.error('Please paste your resume content');
+    if (!file) {
+      toast.error('Please upload your resume');
       return;
     }
     setLoading(true);
     try {
-      const response = await resumeService.analyze(content);
-      setResult(response.data);
+      const response = await resumeService.analyzeFile(file);
+      // Extract the data object from the response
+      const analysisData = response.data.data || response.data;
+      setResult(analysisData);
+      console.log('Analysis result:', analysisData);
       toast.success('Analysis complete!');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Analysis failed');
+      toast.error(error.response?.data?.message || 'Analysis failed');
     } finally {
       setLoading(false);
     }
   };
 
   const getScoreColor = (score) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
+    const numScore = typeof score === 'number' ? score : parseInt(score) || 0;
+    if (numScore >= 80) return 'text-green-600';
+    if (numScore >= 60) return 'text-yellow-600';
     return 'text-red-600';
   };
 
@@ -60,19 +81,33 @@ export default function ResumeAnalyzer() {
             <Card className="p-8" data-testid="input-card">
               <div className="space-y-6">
                 <div>
-                  <Label htmlFor="resume">Paste Your Resume Content</Label>
-                  <Textarea
-                    id="resume"
-                    placeholder="Copy and paste your resume text here..."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="mt-2 min-h-[400px] font-mono text-sm"
-                    data-testid="resume-content-input"
-                  />
+                  <Label htmlFor="resume">Upload Your Resume</Label>
+                  <div className="mt-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
+                    <input
+                      id="resume"
+                      type="file"
+                      accept=".pdf,.txt,.docx"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      data-testid="resume-file-input"
+                    />
+                    <label htmlFor="resume" className="cursor-pointer flex flex-col items-center gap-3">
+                      <Upload className="w-12 h-12 text-muted-foreground" />
+                      <div>
+                        <p className="font-semibold text-foreground">Click to upload or drag and drop</p>
+                        <p className="text-sm text-muted-foreground mt-1">PDF, TXT, or DOCX (Max 5MB)</p>
+                      </div>
+                      {fileName && (
+                        <p className="text-sm text-green-600 font-medium mt-2">
+                          ✓ {fileName}
+                        </p>
+                      )}
+                    </label>
+                  </div>
                 </div>
                 <Button
                   onClick={handleAnalyze}
-                  disabled={loading}
+                  disabled={loading || !file}
                   className="w-full btn-primary h-12"
                   data-testid="analyze-button"
                 >
@@ -108,10 +143,16 @@ export default function ResumeAnalyzer() {
                 >
                   <div className="text-center" data-testid="ats-score-display">
                     <div className={`text-6xl font-heading font-bold mb-2 ${getScoreColor(result.score)}`}>
-                      {Math.round(result.score)}
+                      {result.score && !isNaN(result.score) ? Math.round(result.score) : '—'}%
                     </div>
                     <p className="text-muted-foreground mb-4">ATS Compatibility Score</p>
-                    <Progress value={result.score} className="h-2" />
+                    <Progress value={result.score && !isNaN(result.score) ? result.score : 0} className="h-2" />
+                    <Button 
+                      onClick={() => navigate('/job-match')}
+                      className="mt-6 bg-primary hover:bg-primary/90"
+                    >
+                      Match with Job Descriptions
+                    </Button>
                   </div>
 
                   {result.strengths?.length > 0 && (
