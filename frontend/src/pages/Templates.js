@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
@@ -8,6 +9,7 @@ import { toast } from 'sonner';
 import { Eye, Download } from 'lucide-react';
 
 export default function Templates() {
+  const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -26,7 +28,7 @@ export default function Templates() {
   }, []);
 
   const handleUseTemplate = (template) => {
-    toast.success(`Using ${template.name} template`);
+    navigate(`/template-editor?id=${template.id}&name=${encodeURIComponent(template.name)}`);
   };
 
   return (
@@ -43,7 +45,7 @@ export default function Templates() {
               Resume Templates
             </h1>
             <p className="text-lg text-muted-foreground">
-              Choose from 8+ professional, ATS-friendly templates
+              Choose from 18 professional, ATS-friendly templates
             </p>
           </div>
 

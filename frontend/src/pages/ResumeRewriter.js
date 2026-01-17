@@ -8,26 +8,60 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { resumeService } from '../services/api';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw, Copy, Download } from 'lucide-react';
+import { Loader2, RefreshCw, Copy, Download, Upload, FileText } from 'lucide-react';
 
 export default function ResumeRewriter() {
-  const [originalContent, setOriginalContent] = useState('');
+  const [jobDescription, setJobDescription] = useState('');
+  const [resumeFile, setResumeFile] = useState(null);
+  const [resumeContent, setResumeContent] = useState('');
   const [rewrittenContent, setRewrittenContent] = useState('');
-  const [tone, setTone] = useState('professional');
+  const [analysisReport, setAnalysisReport] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState('modern');
   const [loading, setLoading] = useState(false);
+  const [atsScore, setATSScore] = useState(null);
+  const [jobMatch, setJobMatch] = useState(null);
 
-  const handleRewrite = async () => {
-    if (!originalContent.trim()) {
-      toast.error('Please paste your resume content');
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!jobDescription.trim()) {
+      toast.error('Please provide a job description first');
       return;
     }
+
+    setResumeFile(file);
     setLoading(true);
+
     try {
-      const response = await resumeService.rewrite(originalContent, tone);
-      setRewrittenContent(response.data.rewritten_content);
-      toast.success('Resume rewritten successfully!');
+      // Extract text from file
+      const text = await file.text();
+      setResumeContent(text);
+
+      // Analyze and rewrite resume with job description
+      const response = await resumeService.matchJobFile(file, jobDescription);
+      
+      setAnalysisReport(response.data);
+      
+      // Extract job match percentage if available
+      if (response.data.analysis && response.data.analysis.includes('match')) {
+        const matchPercentage = response.data.analysis.match(/(\d+)%\s*match/i);
+        if (matchPercentage) {
+          setJobMatch(parseInt(matchPercentage[1]));
+        }
+      }
+      
+      // Generate rewritten resume with the job description alignment
+      const rewriteResponse = await resumeService.rewrite(text, 'professional', jobDescription);
+      setRewrittenContent(rewriteResponse.data.rewritten_content);
+      setATSScore(rewriteResponse.data.ats_score);
+      
+      const scoreEmoji = rewriteResponse.data.ats_score >= 95 ? '🎉' : rewriteResponse.data.ats_score >= 85 ? '✅' : '📝';
+      toast.success(`${scoreEmoji} Resume rewritten! ATS Score: ${rewriteResponse.data.ats_score}%`);
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Rewrite failed');
+      toast.error(error.response?.data?.detail || 'Failed to process resume');
+      setResumeFile(null);
+      setResumeContent('');
     } finally {
       setLoading(false);
     }
@@ -37,6 +71,24 @@ export default function ResumeRewriter() {
     navigator.clipboard.writeText(rewrittenContent);
     toast.success('Copied to clipboard!');
   };
+
+  const handleDownload = () => {
+    const element = document.createElement('a');
+    const file = new Blob([rewrittenContent], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'rewritten_resume.txt';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    toast.success('Resume downloaded!');
+  };
+
+  const templates = [
+    { value: 'modern', label: 'Modern' },
+    { value: 'classic', label: 'Classic' },
+    { value: 'minimal', label: 'Minimal' },
+    { value: 'creative', label: 'Creative' },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,65 +104,89 @@ export default function ResumeRewriter() {
               AI Resume Rewriter
             </h1>
             <p className="text-lg text-muted-foreground">
-              Transform your resume with AI-powered improvements
+              Transform your resume with AI-powered improvements based on job description
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
-            <Card className="p-8" data-testid="original-resume-card">
+            {/* Left Column - Job Description & Resume Upload */}
+            <Card className="p-8" data-testid="job-description-card">
               <div className="space-y-6">
                 <div>
-                  <Label htmlFor="original">Original Resume</Label>
+                  <Label htmlFor="jobdesc">Job Description</Label>
                   <Textarea
-                    id="original"
-                    placeholder="Paste your current resume content..."
-                    value={originalContent}
-                    onChange={(e) => setOriginalContent(e.target.value)}
-                    className="mt-2 min-h-[400px] font-mono text-sm"
-                    data-testid="original-resume-input"
+                    id="jobdesc"
+                    placeholder="Paste the job description here..."
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    className="mt-2 min-h-[250px] font-mono text-sm"
+                    data-testid="job-description-input"
                   />
                 </div>
+
                 <div>
-                  <Label htmlFor="tone">Tone</Label>
-                  <Select value={tone} onValueChange={setTone}>
-                    <SelectTrigger className="mt-2" data-testid="tone-select">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="professional">Professional</SelectItem>
-                      <SelectItem value="creative">Creative</SelectItem>
-                      <SelectItem value="technical">Technical</SelectItem>
-                      <SelectItem value="executive">Executive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button
-                  onClick={handleRewrite}
-                  disabled={loading}
-                  className="w-full btn-primary h-12"
-                  data-testid="rewrite-button"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                      Rewriting...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="w-5 h-5 mr-2" />
-                      Rewrite Resume
-                    </>
+                  <Label htmlFor="resume-upload" className="block mb-2">
+                    Upload Your Resume
+                  </Label>
+                  <div className="relative">
+                    <input
+                      id="resume-upload"
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={handleFileUpload}
+                      disabled={loading || !jobDescription.trim()}
+                      className="hidden"
+                      data-testid="resume-file-input"
+                    />
+                    <label
+                      htmlFor="resume-upload"
+                      className={`flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                        loading || !jobDescription.trim()
+                          ? 'bg-muted border-muted-foreground/20 cursor-not-allowed'
+                          : 'bg-muted hover:bg-accent border-border hover:border-primary'
+                      }`}
+                    >
+                      <div className="text-center">
+                        <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                        <p className="text-sm font-medium text-foreground">
+                          {resumeFile ? resumeFile.name : 'Click to upload resume'}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          PDF, DOC, DOCX, or TXT
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                  {jobDescription.trim() === '' && (
+                    <p className="text-xs text-yellow-600 mt-2">
+                      ⚠️ Please enter a job description first
+                    </p>
                   )}
-                </Button>
+                </div>
+
+                {resumeContent && (
+                  <div className="pt-4 border-t">
+                    <Label className="text-xs text-muted-foreground">Uploaded Resume Preview</Label>
+                    <div className="mt-2 p-4 bg-muted rounded max-h-32 overflow-y-auto text-xs text-foreground">
+                      {resumeContent.substring(0, 300)}...
+                    </div>
+                  </div>
+                )}
               </div>
             </Card>
 
+            {/* Right Column - Rewritten Resume */}
             <Card className="p-8" data-testid="rewritten-resume-card">
               {!rewrittenContent ? (
                 <div className="flex items-center justify-center h-full text-center">
                   <div>
-                    <RefreshCw className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">Your rewritten resume will appear here</p>
+                    <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground mb-2">
+                      Your rewritten resume will appear here
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Upload a resume to get started
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -121,7 +197,21 @@ export default function ResumeRewriter() {
                   className="space-y-6"
                 >
                   <div>
-                    <Label>Rewritten Resume</Label>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label>Rewritten Resume</Label>
+                      <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {templates.map((t) => (
+                            <SelectItem key={t.value} value={t.value}>
+                              {t.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <Textarea
                       value={rewrittenContent}
                       onChange={(e) => setRewrittenContent(e.target.value)}
@@ -129,30 +219,93 @@ export default function ResumeRewriter() {
                       data-testid="rewritten-resume-output"
                     />
                   </div>
-                  <div className="flex space-x-3">
+
+                  {analysisReport && (
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className={`p-4 rounded-lg border-2 ${atsScore >= 95 ? 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700' : 'bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-sm">ATS Score</h3>
+                          <span className={`text-2xl font-bold ${atsScore >= 95 ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'}`}>
+                            {atsScore}%
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {atsScore >= 95 ? '✅ Excellent ATS Compatibility' : atsScore >= 85 ? '⚠️ Good ATS Score' : '📝 Needs Improvement'}
+                        </p>
+                      </div>
+                      <div className={`p-4 rounded-lg border-2 ${jobMatch && jobMatch >= 85 ? 'bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-700' : 'bg-amber-50 dark:bg-amber-950 border-amber-300 dark:border-amber-700'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-sm">Job Match</h3>
+                          <span className={`text-2xl font-bold ${jobMatch && jobMatch >= 85 ? 'text-purple-600 dark:text-purple-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                            {jobMatch ? `${jobMatch}%` : 'Analyzing...'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {jobMatch && jobMatch >= 85 ? '✅ Strong Alignment' : jobMatch && jobMatch >= 70 ? '⚠️ Good Fit' : '📝 Room for Improvement'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {analysisReport && (
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <h3 className="font-semibold text-sm mb-2">Optimization Summary</h3>
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <p>✓ Resume optimized for ATS parsing</p>
+                        <p>✓ Aligned with job description keywords</p>
+                        <p>✓ Applied professional formatting</p>
+                        {atsScore && atsScore >= 95 && <p className="text-green-700 dark:text-green-300 font-medium">✓ ATS Score exceeds 95% - Ready to submit!</p>}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3">
                     <Button
                       onClick={handleCopy}
                       variant="outline"
-                      className="flex-1"
+                      className="w-full"
                       data-testid="copy-button"
                     >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy
                     </Button>
                     <Button
-                      onClick={() => toast.info('Download feature coming soon!')}
+                      onClick={handleDownload}
                       variant="outline"
-                      className="flex-1"
+                      className="w-full"
                       data-testid="download-button"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Download
                     </Button>
                   </div>
+
+                  <Button
+                    onClick={() => toast.info('Template customization coming soon!')}
+                    className="w-full btn-primary"
+                  >
+                    Use Multiple Templates to Create Resume
+                  </Button>
                 </motion.div>
               )}
             </Card>
           </div>
+
+          {loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-lg"
+            >
+              <Card className="p-8 text-center">
+                <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+                <p className="text-foreground font-medium">Analyzing and rewriting your resume...</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  This may take a moment
+                </p>
+              </Card>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </div>

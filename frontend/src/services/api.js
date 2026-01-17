@@ -76,8 +76,8 @@ export const resumeService = {
       }
     });
   },
-  rewrite: (content, tone = 'professional') =>
-    api.post('/resumes/rewrite', { resume_content: content, tone }),
+  rewrite: (content, tone = 'professional', jobDescription = '') =>
+    api.post('/resumes/rewrite', { resume_content: content, tone, job_description: jobDescription }),
   create: (data) => api.post('/resumes', data),
   getAll: () => api.get('/resumes'),
   getOne: (id) => api.get(`/resumes/${id}`),

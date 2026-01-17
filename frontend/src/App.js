@@ -10,6 +10,7 @@ import ResumeAnalyzer from './pages/ResumeAnalyzer';
 import JobMatch from './pages/JobMatch';
 import ResumeRewriter from './pages/ResumeRewriter';
 import Templates from './pages/Templates';
+import TemplateEditor from './pages/TemplateEditor';
 import JobsBoard from './pages/JobsBoard';
 import Applications from './pages/Applications';
 import Profile from './pages/Profile';
@@ -39,6 +40,7 @@ function AppRoutes() {
       <Route path="/match" element={<PrivateRoute><JobMatch /></PrivateRoute>} />
       <Route path="/rewrite" element={<PrivateRoute><ResumeRewriter /></PrivateRoute>} />
       <Route path="/templates" element={<PrivateRoute><Templates /></PrivateRoute>} />
+      <Route path="/template-editor" element={<PrivateRoute><TemplateEditor /></PrivateRoute>} />
       <Route path="/jobs" element={<PrivateRoute><JobsBoard /></PrivateRoute>} />
       <Route path="/applications" element={<PrivateRoute><Applications /></PrivateRoute>} />
       <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />

@@ -497,19 +497,173 @@ router.post('/analyze', async (req, res) => {
   }
 });
 
-// REWRITE resume (placeholder)
+// Calculate ATS score based on resume content
+function calculateATSScore(resumeText, jobDescription = '') {
+  let score = 50; // Base score
+  
+  // Check for proper formatting (no tables, no images, plain text friendly)
+  if (!resumeText.includes('|') && !resumeText.includes('├') && !resumeText.includes('─')) {
+    score += 5;
+  }
+  
+  // Check for standard sections
+  const sections = ['experience', 'education', 'skills', 'summary', 'professional'];
+  const sectionCount = sections.filter(s => resumeText.toLowerCase().includes(s)).length;
+  score += Math.min(sectionCount * 4, 15);
+  
+  // Check for quantifiable metrics (numbers, percentages)
+  const metricsRegex = /(\d+%|\d+\s*(years?|projects?|clients?|increased?|improved?))/gi;
+  const metricsCount = (resumeText.match(metricsRegex) || []).length;
+  score += Math.min(metricsCount * 2, 15);
+  
+  // Check for action verbs
+  const actionVerbs = ['led', 'managed', 'developed', 'designed', 'implemented', 'created', 'improved', 'increased', 'achieved', 'directed', 'coordinated', 'established', 'enhanced'];
+  const verbCount = actionVerbs.filter(verb => resumeText.toLowerCase().includes(verb)).length;
+  score += Math.min(verbCount * 1.5, 12);
+  
+  // Job keyword matching if job description provided
+  if (jobDescription.trim()) {
+    const jobKeywords = jobDescription.toLowerCase().split(/\s+/).filter(w => w.length > 4);
+    const matchedKeywords = jobKeywords.filter(keyword => resumeText.toLowerCase().includes(keyword));
+    const keywordMatchPercentage = (matchedKeywords.length / Math.max(jobKeywords.length, 1)) * 100;
+    score += Math.min(keywordMatchPercentage / 10, 20);
+  }
+  
+  // Check for common ATS-breaking elements
+  if (!resumeText.includes('<') && !resumeText.includes('>')) score += 3;
+  if (!resumeText.includes('[') || !resumeText.includes(']')) score += 2;
+  
+  // Ensure minimum length
+  if (resumeText.length > 500) score += 5;
+  
+  return Math.min(Math.round(score), 100);
+}
+
+// Call LLM to rewrite resume with aggressive ATS optimization
+async function rewriteResumeWithLLM(resumeContent, jobDescription, tone = 'professional') {
+  try {
+    // Extract key requirements from job description
+    const jobKeywords = jobDescription
+      .toLowerCase()
+      .split(/[,\.\n]/)
+      .map(s => s.trim())
+      .filter(s => s.length > 4 && s.length < 50);
+
+    const prompt = `You are an elite ATS (Applicant Tracking System) optimization expert and professional resume writer.
+
+CRITICAL: Rewrite this resume to achieve an ATS score of 95%+ and perfect job alignment.
+
+JOB DESCRIPTION:
+${jobDescription || 'Optimize for general roles'}
+
+KEY REQUIREMENTS TO INCORPORATE:
+${jobKeywords.slice(0, 10).join(', ')}
+
+ORIGINAL RESUME:
+${resumeContent}
+
+REWRITING INSTRUCTIONS - FOLLOW EXACTLY:
+
+1. ATS OPTIMIZATION (CRITICAL):
+   - Use clean, simple formatting with line breaks and bullet points
+   - NO tables, images, columns, or special characters (except common punctuation)
+   - NO header/footer content
+   - Use standard fonts and formatting only
+   - Each line should be scannable by ATS parsers
+
+2. CONTENT STRUCTURE (Required sections in order):
+   - Professional Summary (2-3 sentences with top 3 keywords from job)
+   - Core Competencies/Skills (list 10-15 relevant skills from job description)
+   - Professional Experience (with quantifiable results, 3-5 bullets per role)
+   - Education
+   - Optional: Certifications, Technical Skills, Languages
+
+3. JOB ALIGNMENT:
+   - Incorporate 80%+ of key terms from the job description
+   - Mirror the language and terminology used in the job posting
+   - Highlight experience directly related to job requirements
+   - Use same terminology as job posting (not synonyms)
+
+4. CONTENT ENHANCEMENT:
+   - Every achievement must have numbers/metrics (%, $, years, count)
+   - Use strong action verbs: Developed, Implemented, Led, Managed, Designed, Created, Achieved
+   - Make implicit skills explicit and directly mention what they demonstrate
+   - Transform generic descriptions into ATS-friendly, keyword-rich content
+
+5. FORMATTING REQUIREMENTS:
+   - Use only: letters, numbers, standard punctuation, spaces, line breaks
+   - Header: NAME at top, then contact info on separate lines
+   - NO symbols like: ■ ● ★ │ ─ ├ └ etc.
+   - Use "-" or "*" only for bullet points
+   - Clear section headers followed by content
+
+6. OUTPUT FORMAT:
+   Return ONLY the rewritten resume. No explanations, no markdown, no commentary.
+   Start with the candidate's name and end with the last section.`;
+
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'xiaomi/mimo-v2-flash:free',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.6, // Lower temp for consistency
+        max_tokens: 3000
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'Skill Bridge'
+        }
+      }
+    );
+
+    if (!response.data || !response.data.choices || response.data.choices.length === 0) {
+      throw new Error('Invalid response from LLM API');
+    }
+
+    const rewrittenContent = response.data.choices[0].message.content.trim();
+    const atsScore = calculateATSScore(rewrittenContent, jobDescription);
+    
+    console.log('Resume rewrite completed. ATS Score:', atsScore);
+    
+    return { rewrittenContent, atsScore };
+  } catch (error) {
+    console.error('Error rewriting resume:', error.message);
+    throw error;
+  }
+}
+
+// REWRITE resume endpoint
 router.post('/rewrite', async (req, res) => {
   try {
-    const { resume_content, tone } = req.body;
+    const { resume_content, tone = 'professional', job_description = '' } = req.body;
+    
+    if (!resume_content || !resume_content.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Resume content is required'
+      });
+    }
+
+    const result = await rewriteResumeWithLLM(resume_content, job_description, tone);
+
     res.status(200).json({
       success: true,
-      message: 'Resume rewritten',
-      rewritten_content: resume_content + ' (Rewritten with ' + tone + ' tone)'
+      message: 'Resume rewritten successfully',
+      rewritten_content: result.rewrittenContent,
+      ats_score: result.atsScore
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message || 'Failed to rewrite resume'
     });
   }
 });
