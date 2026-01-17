@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import TemplatePreview from '../components/TemplatePreview';
 import { templateService } from '../services/api';
 import { toast } from 'sonner';
-import { Eye, Download } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 export default function Templates() {
   const navigate = useNavigate();
@@ -28,7 +29,34 @@ export default function Templates() {
   }, []);
 
   const handleUseTemplate = (template) => {
-    navigate(`/template-editor?id=${template.id}&name=${encodeURIComponent(template.name)}`);
+    // Map template IDs to their routes
+    const templateRoutes = {
+      1: '/professional-classic',
+      2: '/modern-minimalist',
+      3: '/creative-bold',
+      4: '/executive-summary',
+      5: '/tech-professional',
+      6: '/academic-focus',
+      7: '/chronological-order',
+      8: '/functional-format',
+      9: '/hybrid-structure',
+      10: '/creative-designer',
+      11: '/corporate-professional',
+      12: '/startup-oriented',
+      13: '/one-page-resume',
+      14: '/two-column-layout',
+      15: '/infographic-style',
+      16: '/healthcare-professional',
+      17: '/finance-executive',
+      18: '/marketing-manager'
+    };
+
+    const route = templateRoutes[template.id];
+    if (route) {
+      navigate(route);
+    } else {
+      navigate(`/template-editor?id=${template.id}&name=${encodeURIComponent(template.name)}`);
+    }
   };
 
   return (
@@ -62,35 +90,30 @@ export default function Templates() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.4 }}
                 >
-                  <Card className="overflow-hidden hover:shadow-lg transition-all" data-testid={`template-card-${index}`}>
-                    <div className="aspect-[3/4] bg-stone-100 relative overflow-hidden group">
-                      <img
-                        src={template.preview_url}
-                        alt={template.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                  <Card className="overflow-hidden hover:shadow-lg transition-all h-full flex flex-col" data-testid={`template-card-${index}`}>
+                    <div className="aspect-[3/4] bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden group">
+                      <TemplatePreview templateId={template.id} templateName={template.name} />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
                         <Button
+                          onClick={() => handleUseTemplate(template)}
                           variant="secondary"
-                          size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          data-testid={`preview-button-${index}`}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          data-testid={`template-button-${index}`}
                         >
                           <Eye className="w-4 h-4 mr-2" />
-                          Preview
+                          Use Template
                         </Button>
                       </div>
                     </div>
-                    <div className="p-4">
+                    <div className="p-4 flex-1 flex flex-col">
                       <h3 className="font-heading font-semibold text-foreground mb-1">{template.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-3">{template.description}</p>
+                      <p className="text-sm text-muted-foreground mb-3 flex-1">{template.description}</p>
                       <Button
                         onClick={() => handleUseTemplate(template)}
                         className="w-full"
                         size="sm"
                         data-testid={`use-template-button-${index}`}
                       >
-                        <Download className="w-4 h-4 mr-2" />
                         Use Template
                       </Button>
                     </div>

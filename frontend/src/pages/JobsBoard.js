@@ -32,9 +32,12 @@ export default function JobsBoard() {
     setLoading(true);
     try {
       const response = await jobService.getAll(category);
-      setJobs(response.data);
+      // Handle both array and object response formats
+      const jobsData = Array.isArray(response.data) ? response.data : response.data?.jobs || response.data?.data || [];
+      setJobs(jobsData);
     } catch (error) {
       toast.error('Failed to load jobs');
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -43,9 +46,12 @@ export default function JobsBoard() {
   const fetchResumes = async () => {
     try {
       const response = await resumeService.getAll();
-      setResumes(response.data);
+      // Handle both array and object response formats
+      const resumesData = Array.isArray(response.data) ? response.data : response.data?.resumes || response.data?.data || [];
+      setResumes(resumesData);
     } catch (error) {
       console.error('Failed to load resumes');
+      setResumes([]);
     }
   };
 
@@ -101,6 +107,10 @@ export default function JobsBoard() {
           {loading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            </div>
+          ) : !Array.isArray(jobs) || jobs.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground text-lg">No jobs found. Try a different category.</p>
             </div>
           ) : (
             <div className="grid gap-6">

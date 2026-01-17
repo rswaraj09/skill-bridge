@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
+import { ResumeTemplate } from '../components/ResumeTemplate';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -34,12 +35,25 @@ export default function TemplateEditor() {
   });
 
   useEffect(() => {
-    // Fetch template image
     if (templateId) {
-      const imageUrl = `http://localhost:5001/templates/Template${templateId}.jpeg`;
-      setTemplateImage(imageUrl);
+      // Fetch predefined template data from backend
+      fetchTemplateData(templateId);
     }
   }, [templateId]);
+
+  const fetchTemplateData = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5001/api/templates/${id}`);
+      if (response.ok) {
+        const result = await response.json();
+        setFormData(result.data);
+        toast.success(`Loaded template: ${templateName}`);
+      }
+    } catch (error) {
+      console.error('Error loading template:', error);
+      toast.error('Failed to load template data');
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -338,83 +352,23 @@ ${formData.certifications}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
               <Card className="p-6 sticky top-24 max-h-[calc(100vh-150px)] overflow-y-auto">
-                <div className="bg-white rounded-lg border-2 border-gray-200 shadow-lg">
-                  {templateImage ? (
-                    <div className="relative w-full bg-gray-50 rounded">
-                      {/* Template Image Background */}
-                      <img
-                        src={templateImage}
-                        alt={templateName}
-                        className="w-full h-auto"
-                      />
-
-                      {/* Overlay with Resume Data */}
-                      <div className="absolute inset-0 p-8 text-sm text-black pointer-events-none">
-                        <div className="mb-4">
-                          <h2 className="text-2xl font-bold">
-                            {formData.firstName} {formData.lastName}
-                          </h2>
-                          <p className="text-gray-600 text-xs">
-                            {formData.profession}
-                          </p>
-                        </div>
-
-                        <div className="text-xs mb-3 leading-tight">
-                          <p>{formData.email}</p>
-                          <p>{formData.phone}</p>
-                          {(formData.city || formData.country || formData.pinCode) && (
-                            <p>
-                              {formData.city}
-                              {formData.city && formData.country && ', '}
-                              {formData.country}
-                              {(formData.city || formData.country) && formData.pinCode && ' - '}
-                              {formData.pinCode}
-                            </p>
-                          )}
-                        </div>
-
-                        {formData.summary && (
-                          <div className="mb-3">
-                            <p className="font-semibold text-xs mb-1">SUMMARY</p>
-                            <p className="text-xs whitespace-pre-wrap line-clamp-3">
-                              {formData.summary}
-                            </p>
-                          </div>
-                        )}
-
-                        {formData.experience && (
-                          <div className="mb-3">
-                            <p className="font-semibold text-xs mb-1">EXPERIENCE</p>
-                            <p className="text-xs whitespace-pre-wrap line-clamp-2">
-                              {formData.experience}
-                            </p>
-                          </div>
-                        )}
-
-                        {formData.education && (
-                          <div className="mb-3">
-                            <p className="font-semibold text-xs mb-1">EDUCATION</p>
-                            <p className="text-xs whitespace-pre-wrap line-clamp-2">
-                              {formData.education}
-                            </p>
-                          </div>
-                        )}
-
-                        {formData.skills && (
-                          <div className="mb-3">
-                            <p className="font-semibold text-xs mb-1">SKILLS</p>
-                            <p className="text-xs whitespace-pre-wrap line-clamp-2">
-                              {formData.skills}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full h-96 bg-gray-100 flex items-center justify-center rounded">
-                      <p className="text-muted-foreground">Loading template...</p>
-                    </div>
-                  )}
+                <div className="bg-white rounded-lg border-2 border-gray-200 shadow-lg overflow-auto">
+                  {/* Dynamic Resume Template */}
+                  <ResumeTemplate
+                    firstName={formData.firstName}
+                    lastName={formData.lastName}
+                    email={formData.email}
+                    phone={formData.phone}
+                    profession={formData.profession}
+                    city={formData.city}
+                    country={formData.country}
+                    pinCode={formData.pinCode}
+                    summary={formData.summary}
+                    experience={formData.experience}
+                    education={formData.education}
+                    skills={formData.skills}
+                    certifications={formData.certifications}
+                  />
                 </div>
 
                 <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
