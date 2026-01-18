@@ -82,14 +82,12 @@ export default function CorporateProf() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Corporate Professional Resume</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT: FORM */}
-          <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* LEFT: FORM SIDEBAR */}
+        <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
+          <div className="p-6 space-y-6 text-gray-900">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-slate-100 rounded-lg border-2 border-slate-700">
               <h3 className="text-lg font-bold text-slate-700 mb-4">Profile Photo</h3>
@@ -99,7 +97,7 @@ export default function CorporateProf() {
                 ) : (
                   <div className="w-32 h-32 rounded-lg bg-slate-300 flex items-center justify-center text-4xl text-slate-600">💼</div>
                 )}
-                <label className="cursor-pointer bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition block text-center font-semibold">
+                <label className="cursor-pointer bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800 transition block text-center font-semibold w-full">
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                   Upload Photo
                 </label>
@@ -156,9 +154,14 @@ export default function CorporateProf() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT: PREVIEW */}
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8 border-l-8 border-slate-700">
+        {/* RIGHT: A4 PREVIEW */}
+        <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
+          <div
+            className="bg-gradient-to-br from-slate-50 to-slate-100 shadow-2xl overflow-hidden relative border-l-8 border-slate-700"
+            style={{ width: '210mm', minHeight: '297mm' }}
+          >
             <div className="bg-slate-700 text-white p-8 pb-12">
               <div className="flex gap-4 items-center">
                 {profilePhoto && (

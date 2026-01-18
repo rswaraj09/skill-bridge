@@ -16,11 +16,15 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+import passport from './config/passport.js'; // Import passport config
+
 // Middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
+
+app.use(passport.initialize()); // Initialize Passport
 
 // Increase body parser limits to handle large resumes
 app.use(express.json({ limit: '50mb' }));

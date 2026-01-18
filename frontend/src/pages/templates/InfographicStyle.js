@@ -48,12 +48,6 @@ export default function InfographicStyle() {
     }
   };
 
-  const updateSkillLevel = (index, value) => {
-    const newSkills = [...skills];
-    newSkills[index].level = Math.max(0, Math.min(100, value));
-    setSkills(newSkills);
-  };
-
   const updateSkillName = (index, value) => {
     const newSkills = [...skills];
     newSkills[index].name = value;
@@ -68,14 +62,12 @@ export default function InfographicStyle() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Infographic Style Resume</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT: FORM */}
-          <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* LEFT: FORM SIDEBAR */}
+        <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
+          <div className="p-6 space-y-6 text-gray-900">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-yellow-50 rounded-lg border-2 border-yellow-500">
               <h3 className="text-lg font-bold text-yellow-900 mb-4">Profile Photo</h3>
@@ -85,7 +77,7 @@ export default function InfographicStyle() {
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-yellow-200 flex items-center justify-center text-4xl">📊</div>
                 )}
-                <label className="cursor-pointer bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition block text-center font-semibold">
+                <label className="cursor-pointer bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition block text-center font-semibold w-full">
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                   Upload Photo
                 </label>
@@ -140,71 +132,78 @@ export default function InfographicStyle() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT: PREVIEW */}
-          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8 text-white p-8 space-y-6">
-            {/* Header */}
-            <div className="text-center">
-              {profilePhoto && (
-                <img src={profilePhoto} alt="Profile" className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-yellow-400 shadow-lg" />
-              )}
-              <h1 className="text-3xl font-bold text-yellow-400">{name}</h1>
-              <h2 className="text-lg text-gray-300">{title}</h2>
-              <div className="text-sm text-gray-400 mt-2 flex justify-center gap-3 flex-wrap">
-                <span>{email}</span>
-                <span>•</span>
-                <span>{phone}</span>
+        {/* RIGHT: A4 PREVIEW */}
+        <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
+          <div
+            className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl overflow-hidden relative text-white"
+            style={{ width: '210mm', minHeight: '297mm' }}
+          >
+            <div className="p-8 space-y-6">
+              {/* Header */}
+              <div className="text-center">
+                {profilePhoto && (
+                  <img src={profilePhoto} alt="Profile" className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-yellow-400 shadow-lg" />
+                )}
+                <h1 className="text-3xl font-bold text-yellow-400">{name}</h1>
+                <h2 className="text-lg text-gray-300">{title}</h2>
+                <div className="text-sm text-gray-400 mt-2 flex justify-center gap-3 flex-wrap">
+                  <span>{email}</span>
+                  <span>•</span>
+                  <span>{phone}</span>
+                </div>
               </div>
-            </div>
 
-            {/* Summary */}
-            <div className="border-t border-gray-600 pt-4">
-              <h3 className="text-sm font-bold text-yellow-400 uppercase tracking-wide mb-2">About</h3>
-              <p className="text-sm text-gray-300 leading-relaxed">{summary}</p>
-            </div>
+              {/* Summary */}
+              <div className="border-t border-gray-600 pt-4">
+                <h3 className="text-sm font-bold text-yellow-400 uppercase tracking-wide mb-2">About</h3>
+                <p className="text-sm text-gray-300 leading-relaxed">{summary}</p>
+              </div>
 
-            {/* Skills Visualization */}
-            <div className="border-t border-gray-600 pt-4">
-              <h3 className="text-sm font-bold text-yellow-400 uppercase tracking-wide mb-3">Technical Skills</h3>
-              <div className="space-y-2">
-                {skills.map((skill, i) => (
-                  <div key={i} className="text-xs">
-                    <div className="flex justify-between mb-1">
-                      <span className="text-gray-300">{skill.name}</span>
-                      <span className="text-yellow-400 font-bold">{skill.level}%</span>
+              {/* Skills Visualization */}
+              <div className="border-t border-gray-600 pt-4">
+                <h3 className="text-sm font-bold text-yellow-400 uppercase tracking-wide mb-3">Technical Skills</h3>
+                <div className="space-y-2">
+                  {skills.map((skill, i) => (
+                    <div key={i} className="text-xs">
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-300">{skill.name}</span>
+                        <span className="text-yellow-400 font-bold">{skill.level}%</span>
+                      </div>
+                      <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full" style={{ width: `${skill.level}%` }} />
+                      </div>
                     </div>
-                    <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full" style={{ width: `${skill.level}%` }} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Experience */}
+              <div className="border-t border-gray-600 pt-4">
+                <h3 className="text-sm font-bold text-yellow-400 uppercase tracking-wide mb-3">Experience</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {experiences.map((exp, i) => (
+                    <div key={i} className="bg-gray-700 bg-opacity-50 p-3 rounded-lg border-l-4 border-yellow-400">
+                      <div className="font-semibold text-gray-200">{exp.title}</div>
+                      <div className="text-sm text-yellow-400">{exp.company}</div>
+                      <div className="text-xs text-gray-400">{exp.period}</div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Experience */}
-            <div className="border-t border-gray-600 pt-4">
-              <h3 className="text-sm font-bold text-yellow-400 uppercase tracking-wide mb-3">Experience</h3>
-              <div className="grid grid-cols-1 gap-3">
-                {experiences.map((exp, i) => (
-                  <div key={i} className="bg-gray-700 bg-opacity-50 p-3 rounded-lg border-l-4 border-yellow-400">
-                    <div className="font-semibold text-gray-200">{exp.title}</div>
-                    <div className="text-sm text-yellow-400">{exp.company}</div>
-                    <div className="text-xs text-gray-400">{exp.period}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Education */}
-            <div className="border-t border-gray-600 pt-4">
-              <h3 className="text-sm font-bold text-yellow-400 uppercase tracking-wide mb-2">Education</h3>
-              <div className="space-y-2">
-                {education.map((edu, i) => (
-                  <div key={i} className="text-sm">
-                    <div className="font-semibold text-gray-200">{edu.degree}</div>
-                    <div className="text-gray-400">{edu.school} • {edu.year}</div>
-                  </div>
-                ))}
+              {/* Education */}
+              <div className="border-t border-gray-600 pt-4">
+                <h3 className="text-sm font-bold text-yellow-400 uppercase tracking-wide mb-2">Education</h3>
+                <div className="space-y-2">
+                  {education.map((edu, i) => (
+                    <div key={i} className="text-sm">
+                      <div className="font-semibold text-gray-200">{edu.degree}</div>
+                      <div className="text-gray-400">{edu.school} • {edu.year}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from './components/ui/sonner';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -14,6 +15,7 @@ import TemplateEditor from './pages/TemplateEditor';
 import JobsBoard from './pages/JobsBoard';
 import Applications from './pages/Applications';
 import Profile from './pages/Profile';
+import AuthSuccess from './pages/AuthSuccess';
 // Template imports
 import ProfessionalClassic from './pages/templates/ProfessionalClassic';
 import CreativeBold from './pages/templates/CreativeBold';
@@ -31,7 +33,7 @@ import ChronologicalOrder from './pages/templates/ChronologicalOrder';
 import FunctionalFormat from './pages/templates/FunctionalFormat';
 import HybridStructure from './pages/templates/HybridStructure';
 import InfographicStyle from './pages/templates/InfographicStyle';
-import ModernMinimalist from './pages/ModernMinimalist';
+
 import CreativeDesigner from './pages/CreativeDesigner';
 import { useAuth } from './context/AuthContext';
 import { BackgroundLayout } from './components/BackgroundLayout';
@@ -55,6 +57,7 @@ function AppRoutes() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+      <Route path="/auth-success" element={<AuthSuccess />} />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/analyze" element={<PrivateRoute><ResumeAnalyzer /></PrivateRoute>} />
       <Route path="/match" element={<PrivateRoute><JobMatch /></PrivateRoute>} />
@@ -78,7 +81,7 @@ function AppRoutes() {
       <Route path="/functional-format" element={<PrivateRoute><FunctionalFormat /></PrivateRoute>} />
       <Route path="/hybrid-structure" element={<PrivateRoute><HybridStructure /></PrivateRoute>} />
       <Route path="/infographic-style" element={<PrivateRoute><InfographicStyle /></PrivateRoute>} />
-      <Route path="/modern-minimalist" element={<PrivateRoute><ModernMinimalist /></PrivateRoute>} />
+
       <Route path="/creative-designer" element={<PrivateRoute><CreativeDesigner /></PrivateRoute>} />
       {/* Other Routes */}
       <Route path="/jobs" element={<PrivateRoute><JobsBoard /></PrivateRoute>} />
@@ -91,14 +94,16 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <BackgroundLayout>
-          <div className="App">
-            <AppRoutes />
-            <Toaster position="top-right" />
-          </div>
-        </BackgroundLayout>
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <BackgroundLayout>
+            <div className="App">
+              <AppRoutes />
+              <Toaster position="top-right" />
+            </div>
+          </BackgroundLayout>
+        </BrowserRouter>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

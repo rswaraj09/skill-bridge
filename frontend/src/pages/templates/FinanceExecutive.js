@@ -83,14 +83,12 @@ export default function FinanceExecutive() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Finance Executive Resume</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT: FORM */}
-          <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* LEFT: FORM SIDEBAR */}
+        <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
+          <div className="p-6 space-y-6 text-gray-900">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-purple-50 rounded-lg border-2 border-purple-700">
               <h3 className="text-lg font-bold text-purple-900 mb-4">Profile Photo</h3>
@@ -100,7 +98,7 @@ export default function FinanceExecutive() {
                 ) : (
                   <div className="w-32 h-32 rounded-lg bg-purple-200 flex items-center justify-center text-4xl">💰</div>
                 )}
-                <label className="cursor-pointer bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-800 transition block text-center font-semibold">
+                <label className="cursor-pointer bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-800 transition block text-center font-semibold w-full">
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                   Upload Photo
                 </label>
@@ -157,10 +155,15 @@ export default function FinanceExecutive() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT: PREVIEW */}
-          <div className="bg-gradient-to-b from-purple-900 to-purple-800 rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8 text-white">
-            <div className="p-8 space-y-5">
+        {/* RIGHT: A4 PREVIEW */}
+        <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
+          <div
+            className="shadow-2xl overflow-hidden relative"
+            style={{ width: '210mm', minHeight: '297mm' }}
+          >
+            <div className="bg-gradient-to-b from-purple-900 to-purple-800 text-white h-full min-h-[297mm] p-8 space-y-5">
               {/* Header */}
               <div className="border-b-2 border-purple-400 pb-6">
                 <div className="flex gap-4 items-center mb-3">

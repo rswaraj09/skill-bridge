@@ -68,14 +68,12 @@ export default function TwoColumnLayout() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Two Column Layout Resume</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT: FORM */}
-          <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* LEFT: FORM SIDEBAR */}
+        <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
+          <div className="p-6 space-y-6 text-gray-900">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-teal-50 rounded-lg border-2 border-teal-600">
               <h3 className="text-lg font-bold text-teal-900 mb-4">Profile Photo</h3>
@@ -85,7 +83,7 @@ export default function TwoColumnLayout() {
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-teal-200 flex items-center justify-center text-4xl">👩‍💼</div>
                 )}
-                <label className="cursor-pointer bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition block text-center font-semibold">
+                <label className="cursor-pointer bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition block text-center font-semibold w-full">
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                   Upload Photo
                 </label>
@@ -141,84 +139,107 @@ export default function TwoColumnLayout() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT: PREVIEW */}
-          <div className="rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8 grid grid-cols-1 bg-white border-l-8 border-teal-600">
-            {/* Left Column - Sidebar */}
-            <div className="bg-teal-700 text-white p-6 space-y-6">
-              {/* Photo */}
-              {profilePhoto && (
-                <img src={profilePhoto} alt="Profile" className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-white shadow-lg" />
-              )}
+        {/* RIGHT: A4 PREVIEW */}
+        <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
+          <div
+            className="bg-white shadow-2xl overflow-hidden relative"
+            style={{ width: '210mm', minHeight: '297mm' }}
+          >
+            <div className="grid grid-cols-12 h-full min-h-[297mm]">
+              {/* Left Column - 4 Columns */}
+              <div className="col-span-4 bg-teal-700 text-white p-8 space-y-8">
+                {/* Photo */}
+                <div className="text-center">
+                  {profilePhoto ? (
+                    <img src={profilePhoto} alt="Profile" className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-white shadow-lg" />
+                  ) : (
+                    <div className="w-32 h-32 rounded-full bg-teal-800 flex items-center justify-center text-5xl mx-auto shadow-lg">❖</div>
+                  )}
+                </div>
 
-              {/* Name */}
-              <div className="text-center">
-                <h1 className="text-2xl font-bold">{name}</h1>
-                <h2 className="text-teal-100 text-sm">{title}</h2>
-              </div>
+                {/* Name & Title */}
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold uppercase tracking-wider leading-tight">{name}</h1>
+                  <h2 className="text-teal-200 mt-2 font-medium">{title}</h2>
+                </div>
 
-              {/* Contact */}
-              <div className="text-sm space-y-2 text-teal-100">
-                <div>📧 {email}</div>
-                <div>📞 {phone}</div>
-                <div>📍 {address}</div>
-              </div>
+                {/* Divider */}
+                <div className="h-px bg-teal-500 w-1/2 mx-auto"></div>
 
-              {/* Skills */}
-              <div>
-                <h3 className="font-bold text-teal-200 uppercase text-xs mb-2">Skills</h3>
-                <div className="flex flex-wrap gap-2">
-                  {skills.map((skill, i) => (
-                    <span key={i} className="bg-teal-600 text-white text-xs px-2 py-1 rounded">
-                      {skill}
-                    </span>
-                  ))}
+                {/* Contact */}
+                <div className="text-sm space-y-3">
+                  <div className="opacity-90"><span className="opacity-60 block text-xs uppercase mb-1">Email</span> {email}</div>
+                  <div className="opacity-90"><span className="opacity-60 block text-xs uppercase mb-1">Phone</span> {phone}</div>
+                  <div className="opacity-90"><span className="opacity-60 block text-xs uppercase mb-1">Location</span> {address}</div>
+                </div>
+
+                {/* Skills */}
+                <div>
+                  <h3 className="font-bold text-teal-200 uppercase text-xs tracking-widest mb-4 border-b border-teal-600 pb-2">Expertise</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map((skill, i) => (
+                      <span key={i} className="text-sm bg-teal-800 px-3 py-1 rounded-sm block w-full text-center">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Certifications */}
+                <div>
+                  <h3 className="font-bold text-teal-200 uppercase text-xs tracking-widest mb-4 border-b border-teal-600 pb-2">Certifications</h3>
+                  <div className="space-y-2 text-sm">
+                    {certifications.map((cert, i) => (
+                      <div key={i} className="opacity-90">• {cert}</div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* Certifications */}
-              <div>
-                <h3 className="font-bold text-teal-200 uppercase text-xs mb-2">Certifications</h3>
-                <div className="space-y-1">
-                  {certifications.map((cert, i) => (
-                    <div key={i} className="text-xs text-teal-100">✓ {cert}</div>
-                  ))}
+              {/* Right Column - 8 Columns */}
+              <div className="col-span-8 p-10 space-y-8">
+                {/* Summary */}
+                <div>
+                  <h3 className="font-bold text-teal-700 uppercase text-sm tracking-widest mb-4 border-b-2 border-teal-100 pb-2">Professional Profile</h3>
+                  <p className="text-gray-700 leading-relaxed">{summary}</p>
                 </div>
-              </div>
-            </div>
 
-            {/* Right Column - Main Content */}
-            <div className="p-6 space-y-5">
-              {/* Summary */}
-              <div>
-                <h3 className="font-bold text-teal-700 uppercase text-xs mb-2">Summary</h3>
-                <p className="text-sm text-gray-700">{summary}</p>
-              </div>
-
-              {/* Experience */}
-              <div>
-                <h3 className="font-bold text-teal-700 uppercase text-xs mb-2">Experience</h3>
-                <div className="space-y-3">
-                  {experiences.map((exp, i) => (
-                    <div key={i}>
-                      <div className="font-semibold text-gray-900">{exp.title}</div>
-                      <div className="text-sm text-teal-700">{exp.company}</div>
-                      <div className="text-xs text-gray-600">{exp.period} • {exp.location}</div>
-                    </div>
-                  ))}
+                {/* Experience */}
+                <div>
+                  <h3 className="font-bold text-teal-700 uppercase text-sm tracking-widest mb-6 border-b-2 border-teal-100 pb-2">Experience</h3>
+                  <div className="space-y-6">
+                    {experiences.map((exp, i) => (
+                      <div key={i} className="relative pl-6 border-l-2 border-teal-100">
+                        <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-teal-100 border-2 border-white"></div>
+                        <div className="mb-2">
+                          <h4 className="font-bold text-gray-900 text-lg">{exp.title}</h4>
+                          <div className="text-teal-600 font-medium">{exp.company}</div>
+                          <div className="text-gray-500 text-sm italic">{exp.period} • {exp.location}</div>
+                        </div>
+                        <ul className="list-disc list-inside space-y-1 text-gray-700 text-sm">
+                          {exp.bullets.map((bullet, j) => (
+                            <li key={j}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Education */}
-              <div>
-                <h3 className="font-bold text-teal-700 uppercase text-xs mb-2">Education</h3>
-                <div className="space-y-2">
-                  {education.map((edu, i) => (
-                    <div key={i} className="text-sm">
-                      <div className="font-semibold text-gray-900">{edu.degree}</div>
-                      <div className="text-gray-700">{edu.school} • {edu.year}</div>
-                    </div>
-                  ))}
+                {/* Education */}
+                <div>
+                  <h3 className="font-bold text-teal-700 uppercase text-sm tracking-widest mb-6 border-b-2 border-teal-100 pb-2">Education</h3>
+                  <div className="space-y-4">
+                    {education.map((edu, i) => (
+                      <div key={i}>
+                        <div className="font-bold text-gray-900">{edu.degree}</div>
+                        <div className="text-gray-600">{edu.school}</div>
+                        <div className="text-gray-500 text-sm mt-1">{edu.year}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

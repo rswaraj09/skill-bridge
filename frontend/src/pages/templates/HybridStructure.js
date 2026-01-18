@@ -62,14 +62,12 @@ export default function HybridStructure() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Hybrid Structure Resume</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT: FORM */}
-          <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* LEFT: FORM SIDEBAR */}
+        <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
+          <div className="p-6 space-y-6 text-gray-900">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-emerald-50 rounded-lg border-2 border-emerald-600">
               <h3 className="text-lg font-bold text-emerald-900 mb-4">Profile Photo</h3>
@@ -79,7 +77,7 @@ export default function HybridStructure() {
                 ) : (
                   <div className="w-32 h-32 rounded bg-emerald-200 flex items-center justify-center text-4xl">👥</div>
                 )}
-                <label className="cursor-pointer bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 transition block text-center font-semibold">
+                <label className="cursor-pointer bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 transition block text-center font-semibold w-full bg-blue-900">
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                   Upload Photo
                 </label>
@@ -134,22 +132,27 @@ export default function HybridStructure() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT: PREVIEW */}
-          <div className="bg-white rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8 border-t-4 border-b-4 border-emerald-600">
+        {/* RIGHT: A4 PREVIEW */}
+        <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
+          <div
+            className="bg-white shadow-2xl overflow-hidden relative border-t-8 border-b-8 border-emerald-600"
+            style={{ width: '210mm', minHeight: '297mm' }}
+          >
             <div className="p-8 space-y-6">
               {/* Header */}
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-lg border-l-4 border-emerald-600">
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-lg border-l-4 border-emerald-600">
                 <div className="flex gap-4 items-center">
                   {profilePhoto && (
-                    <img src={profilePhoto} alt="Profile" className="w-20 h-20 rounded object-cover border-3 border-emerald-600 shadow-md" />
+                    <img src={profilePhoto} alt="Profile" className="w-24 h-24 rounded object-cover border-4 border-emerald-600 shadow-md" />
                   )}
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
-                    <h2 className="text-lg text-emerald-700 font-semibold">{title}</h2>
+                    <h1 className="text-3xl font-bold text-gray-900">{name}</h1>
+                    <h2 className="text-xl text-emerald-700 font-semibold">{title}</h2>
                   </div>
                 </div>
-                <div className="mt-3 text-sm text-gray-700 flex gap-4 flex-wrap">
+                <div className="mt-4 text-sm text-gray-700 flex gap-4 flex-wrap">
                   <span>📧 {email}</span>
                   <span>📞 {phone}</span>
                 </div>
@@ -178,10 +181,10 @@ export default function HybridStructure() {
                 <h3 className="text-sm font-bold text-emerald-700 uppercase tracking-wide mb-3">Professional Experience</h3>
                 <div className="space-y-4">
                   {experiences.map((exp, i) => (
-                    <div key={i} className="border-l-4 border-emerald-600 pl-3">
+                    <div key={i} className="border-l-4 border-emerald-600 pl-4 py-1">
                       <div className="font-semibold text-gray-900">{exp.title}</div>
                       <div className="text-sm text-emerald-700">{exp.company}</div>
-                      <div className="text-xs text-gray-600">{exp.period} • {exp.location}</div>
+                      <div className="text-xs text-gray-600 mb-1">{exp.period} • {exp.location}</div>
                     </div>
                   ))}
                 </div>

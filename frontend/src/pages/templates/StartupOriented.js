@@ -82,14 +82,12 @@ export default function StartupOriented() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Startup Oriented Resume</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT: FORM */}
-          <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* LEFT: FORM SIDEBAR */}
+        <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
+          <div className="p-6 space-y-6 text-gray-900">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border-2 border-orange-500">
               <h3 className="text-lg font-bold text-orange-900 mb-4">Profile Photo</h3>
@@ -99,7 +97,7 @@ export default function StartupOriented() {
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-200 to-red-200 flex items-center justify-center text-4xl">🚀</div>
                 )}
-                <label className="cursor-pointer bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition block text-center font-semibold">
+                <label className="cursor-pointer bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition block text-center font-semibold w-full">
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                   Upload Photo
                 </label>
@@ -156,44 +154,57 @@ export default function StartupOriented() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT: PREVIEW */}
-          <div className="bg-white rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8">
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6 text-white">
-              <div className="flex gap-4 items-center">
+        {/* RIGHT: A4 PREVIEW */}
+        <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
+          <div
+            className="bg-white shadow-2xl overflow-hidden relative"
+            style={{ width: '210mm', minHeight: '297mm' }}
+          >
+            {/* Header with gradient */}
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 p-8 text-white">
+              <div className="flex gap-6 items-center">
                 {profilePhoto && (
-                  <img src={profilePhoto} alt="Profile" className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg" />
+                  <img src={profilePhoto} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
                 )}
                 <div>
-                  <h1 className="text-3xl font-bold">{name}</h1>
-                  <h2 className="text-lg text-orange-100">{title}</h2>
+                  <h1 className="text-4xl font-bold tracking-tight">{name}</h1>
+                  <h2 className="text-xl text-orange-100 mt-2 font-medium">{title}</h2>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-8 space-y-6">
               {/* Contact */}
-              <div className="flex flex-wrap gap-3 text-sm text-gray-700">
-                <span>📧 {email}</span>
-                <span>📞 {phone}</span>
-                <span>📍 {address}</span>
+              <div className="flex flex-wrap gap-6 text-sm text-gray-700 border-b pb-6 px-1">
+                <span className="flex items-center gap-2">📧 {email}</span>
+                <span className="flex items-center gap-2">📞 {phone}</span>
+                <span className="flex items-center gap-2">📍 {address}</span>
               </div>
 
               {/* Summary */}
               <div>
-                <h3 className="text-sm font-bold text-orange-600 uppercase mb-2">Executive Summary</h3>
-                <p className="text-sm text-gray-700 leading-relaxed">{summary}</p>
+                <h3 className="text-sm font-bold text-orange-600 uppercase mb-3 px-1">Executive Summary</h3>
+                <p className="text-sm text-gray-700 leading-relaxed px-1">{summary}</p>
               </div>
 
               {/* Experience */}
               <div>
-                <h3 className="text-sm font-bold text-orange-600 uppercase mb-3">Experience</h3>
-                <div className="space-y-3">
+                <h3 className="text-sm font-bold text-orange-600 uppercase mb-4 px-1">Entrepreneurial Experience</h3>
+                <div className="space-y-4">
                   {experiences.map((exp, i) => (
-                    <div key={i} className="bg-gradient-to-r from-orange-50 to-red-50 p-3 rounded border-l-4 border-orange-500">
-                      <div className="font-semibold text-gray-900">{exp.title}</div>
-                      <div className="text-sm text-orange-600">{exp.company}</div>
-                      <div className="text-xs text-gray-600">{exp.period} • {exp.location}</div>
+                    <div key={i} className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border-l-4 border-orange-500">
+                      <div className="flex justify-between items-baseline mb-2">
+                        <div className="font-bold text-gray-900 text-lg">{exp.title}</div>
+                        <div className="text-xs text-orange-700 font-semibold uppercase">{exp.period}</div>
+                      </div>
+                      <div className="text-sm text-orange-800 font-medium mb-2">{exp.company} • {exp.location}</div>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                        {exp.bullets.map((bullet, j) => (
+                          <li key={j}>{bullet}</li>
+                        ))}
+                      </ul>
                     </div>
                   ))}
                 </div>
@@ -201,11 +212,14 @@ export default function StartupOriented() {
 
               {/* Key Skills */}
               <div>
-                <h3 className="text-sm font-bold text-orange-600 uppercase mb-2">Key Skills</h3>
-                <div className="flex flex-wrap gap-2">
+                <h3 className="text-sm font-bold text-orange-600 uppercase mb-3 px-1">Core Competencies</h3>
+                <div className="grid grid-cols-2 gap-3">
                   {skills.map((skill, i) => (
-                    <div key={i} className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">
-                      {skill.name} {skill.percentage}%
+                    <div key={i} className="bg-white border border-orange-100 p-2 rounded flex justify-between items-center px-3">
+                      <span className="text-sm font-semibold text-gray-700">{skill.name}</span>
+                      <div className="w-24 bg-gray-100 rounded-full h-1.5 ml-2">
+                        <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: `${skill.percentage}%` }}></div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -213,10 +227,25 @@ export default function StartupOriented() {
 
               {/* Achievements */}
               <div>
-                <h3 className="text-sm font-bold text-orange-600 uppercase mb-2">Recognition</h3>
-                <div className="space-y-1">
+                <h3 className="text-sm font-bold text-orange-600 uppercase mb-3 px-1">Recognition & Awards</h3>
+                <div className="grid grid-cols-1 gap-2">
                   {certifications.map((cert, i) => (
-                    <div key={i} className="text-sm text-gray-700">★ {cert}</div>
+                    <div key={i} className="text-sm text-gray-700 flex items-center gap-2 px-1">
+                      <span className="text-orange-500 text-lg">★</span> {cert}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              <div>
+                <h3 className="text-sm font-bold text-orange-600 uppercase mb-3 px-1">Education</h3>
+                <div className="space-y-2 px-1">
+                  {education.map((edu, i) => (
+                    <div key={i} className="text-sm">
+                      <div className="font-semibold text-gray-900">{edu.degree}</div>
+                      <div className="text-gray-600">{edu.school} • {edu.year}</div>
+                    </div>
                   ))}
                 </div>
               </div>

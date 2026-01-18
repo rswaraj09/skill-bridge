@@ -20,9 +20,17 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
+    required: false, // Changed to false for social auth
     minlength: [6, 'Password must be at least 6 characters'],
     select: false
+  },
+  avatar: {
+    type: String
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true
   },
   createdAt: {
     type: Date,
@@ -31,9 +39,10 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || !this.password) {
     next();
+    return; // Add return to prevent execution if no password
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -41,7 +50,8 @@ userSchema.pre('save', async function(next) {
 });
 
 // Method to compare passwords
-userSchema.methods.matchPassword = async function(enteredPassword) {
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password) return false; // Handle case where user has no password
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

@@ -84,14 +84,12 @@ export default function TechProfessional() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Tech Professional Resume</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT: FORM */}
-          <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* LEFT: FORM SIDEBAR */}
+        <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
+          <div className="p-6 space-y-6 text-gray-900">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-slate-900 rounded-lg border-2 border-cyan-500">
               <h3 className="text-lg font-bold text-white mb-4">Profile Photo</h3>
@@ -101,7 +99,7 @@ export default function TechProfessional() {
                 ) : (
                   <div className="w-32 h-32 rounded bg-slate-700 flex items-center justify-center text-4xl text-cyan-400">{'<>'}</div>
                 )}
-                <label className="cursor-pointer bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700 transition block text-center font-semibold">
+                <label className="cursor-pointer bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700 transition block text-center font-semibold w-full">
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                   Upload Photo
                 </label>
@@ -111,30 +109,30 @@ export default function TechProfessional() {
             {/* Form Fields */}
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-bold mb-4">Personal Information</h3>
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Personal Information</h3>
                 <div className="space-y-3">
-                  <input type="text" value={name.split(' ')[0]} onChange={(e) => setName(`${e.target.value} ${name.split(' ')[1]}`)} placeholder="First Name" className="w-full border border-gray-300 rounded px-3 py-2" />
-                  <input type="text" value={name.split(' ')[1]} onChange={(e) => setName(`${name.split(' ')[0]} ${e.target.value}`)} placeholder="Last Name" className="w-full border border-gray-300 rounded px-3 py-2" />
-                  <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="w-full border border-gray-300 rounded px-3 py-2" />
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full border border-gray-300 rounded px-3 py-2" />
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" className="w-full border border-gray-300 rounded px-3 py-2" />
+                  <input type="text" value={name.split(' ')[0]} onChange={(e) => setName(`${e.target.value} ${name.split(' ')[1]}`)} placeholder="First Name" className="w-full border border-gray-300 rounded px-3 py-2 bg-white text-gray-900" />
+                  <input type="text" value={name.split(' ')[1]} onChange={(e) => setName(`${name.split(' ')[0]} ${e.target.value}`)} placeholder="Last Name" className="w-full border border-gray-300 rounded px-3 py-2 bg-white text-gray-900" />
+                  <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="w-full border border-gray-300 rounded px-3 py-2 bg-white text-gray-900" />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full border border-gray-300 rounded px-3 py-2 bg-white text-gray-900" />
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" className="w-full border border-gray-300 rounded px-3 py-2 bg-white text-gray-900" />
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-bold mb-4">Summary</h3>
-                <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={4} className="w-full border border-gray-300 rounded px-3 py-2" />
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Summary</h3>
+                <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={4} className="w-full border border-gray-300 rounded px-3 py-2 bg-white text-gray-900" />
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold">Skills</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Skills</h3>
                   <button onClick={addSkill} className="text-sm bg-cyan-600 text-white px-3 py-1 rounded">+ Add</button>
                 </div>
                 <div className="space-y-2">
                   {skills.map((skill, index) => (
                     <div key={index} className="flex gap-2">
-                      <input type="text" value={skill.name} onChange={(e) => updateSkillName(index, e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
+                      <input type="text" value={skill.name} onChange={(e) => updateSkillName(index, e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm bg-white text-gray-900" />
                       <button onClick={() => removeSkill(index)} className="text-red-600">✕</button>
                     </div>
                   ))}
@@ -143,13 +141,13 @@ export default function TechProfessional() {
 
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold">Experience</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Experience</h3>
                   <button onClick={addExperience} className="text-sm bg-cyan-600 text-white px-3 py-1 rounded">+ Add</button>
                 </div>
                 <div className="space-y-3">
                   {experiences.map((exp, i) => (
                     <div key={i} className="border border-gray-300 rounded p-3 bg-gray-50">
-                      <input type="text" value={exp.title} onChange={(e) => { const newExps = [...experiences]; newExps[i].title = e.target.value; setExperiences(newExps); }} placeholder="Job Title" className="w-full border border-gray-300 rounded px-2 py-1 text-sm mb-2" />
+                      <input type="text" value={exp.title} onChange={(e) => { const newExps = [...experiences]; newExps[i].title = e.target.value; setExperiences(newExps); }} placeholder="Job Title" className="w-full border border-gray-300 rounded px-2 py-1 text-sm mb-2 bg-white text-gray-900" />
                       <button onClick={() => removeExperience(i)} className="text-red-600 text-sm">Remove</button>
                     </div>
                   ))}
@@ -157,58 +155,127 @@ export default function TechProfessional() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT: PREVIEW */}
-          <div className="bg-slate-900 rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8 text-white">
-            <div className="p-6 space-y-4">
-              {/* Header */}
-              <div className="border-b-2 border-cyan-500 pb-4">
-                {profilePhoto && (
-                  <img src={profilePhoto} alt="Profile" className="w-16 h-16 rounded object-cover mb-3 border-2 border-cyan-500" />
-                )}
-                <h1 className="text-3xl font-bold text-cyan-400">{name}</h1>
-                <h2 className="text-lg text-gray-300">/* {title} */</h2>
-              </div>
+        {/* RIGHT: A4 PREVIEW */}
+        <div className="flex-1 bg-slate-800 overflow-y-auto p-8 flex justify-center">
+          <div
+            className="shadow-2xl overflow-hidden relative"
+            style={{ width: '210mm', minHeight: '297mm', backgroundColor: '#0f172a' }}
+          >
+            {/* Resume Content */}
+            <div className="p-12 h-full flex flex-col relative z-0">
+              {/* Background Elements */}
+              <div className="absolute top-0 left-0 w-32 h-full bg-slate-800/50 -skew-x-12 -translate-x-16" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
 
-              {/* Summary */}
-              <div className="text-sm text-gray-300">
-                <p>{summary}</p>
-              </div>
-
-              {/* Contact */}
-              <div>
-                <h3 className="text-sm font-bold text-cyan-400 uppercase mb-2">// Contact</h3>
-                <div className="text-xs text-gray-300 space-y-1">
-                  <div>{email} | {phone}</div>
-                  <div>{address}</div>
+              <div className="relative z-10 space-y-12">
+                {/* Header */}
+                <div className="border-b-2 border-cyan-500 pb-8 flex items-start gap-8">
+                  {profilePhoto && (
+                    <img src={profilePhoto} alt="Profile" className="w-32 h-32 rounded object-cover border-4 border-cyan-500 shadow-lg shrink-0" />
+                  )}
+                  <div className="flex-1 pt-2">
+                    <h1 className="text-5xl font-bold text-cyan-400 mb-2 tracking-tight">{name}</h1>
+                    <h2 className="text-2xl text-gray-300">/* {title} */</h2>
+                  </div>
                 </div>
-              </div>
 
-              {/* Skills */}
-              <div>
-                <h3 className="text-sm font-bold text-cyan-400 uppercase mb-2">// Tech Stack</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {skills.map((skill, i) => (
-                    <div key={i} className="text-xs text-gray-300">
-                      <div className="text-cyan-400">└─ {skill.name}</div>
-                      <div className="w-full bg-slate-700 h-1 rounded mt-1">
-                        <div className="bg-cyan-500 h-full rounded" style={{ width: `${skill.percentage}%` }} />
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-12 gap-12">
+                  {/* Left Column (Skills & Contact) - 4 cols */}
+                  <div className="col-span-4 space-y-10">
+                    {/* Contact */}
+                    <div>
+                      <h3 className="text-lg font-bold text-cyan-400 uppercase mb-4 flex items-center gap-2">
+                        <span className="text-cyan-500">{'//'}</span> Contact
+                      </h3>
+                      <div className="text-sm text-gray-300 space-y-3 font-mono">
+                        <div className="break-words">{email}</div>
+                        <div>{phone}</div>
+                        <div>{address}</div>
+                        <div>{website}</div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Experience */}
-              <div>
-                <h3 className="text-sm font-bold text-cyan-400 uppercase mb-2">// Experience</h3>
-                <div className="space-y-2">
-                  {experiences.map((exp, i) => (
-                    <div key={i} className="text-xs text-gray-300">
-                      <div className="text-cyan-400">├─ {exp.title}</div>
-                      <div className="ml-3 text-gray-400">{exp.company} ({exp.period})</div>
+                    {/* Skills */}
+                    <div>
+                      <h3 className="text-lg font-bold text-cyan-400 uppercase mb-4 flex items-center gap-2">
+                        <span className="text-cyan-500">{'//'}</span> Tech Stack
+                      </h3>
+                      <div className="space-y-4">
+                        {skills.map((skill, i) => (
+                          <div key={i} className="text-sm text-gray-300">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-cyan-100">{skill.name}</span>
+                              <span className="text-cyan-500 font-mono">{skill.percentage}%</span>
+                            </div>
+                            <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                              <div className="bg-cyan-500 h-full rounded-full" style={{ width: `${skill.percentage}%` }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  ))}
+
+                    {/* Education */}
+                    <div>
+                      <h3 className="text-lg font-bold text-cyan-400 uppercase mb-4 flex items-center gap-2">
+                        <span className="text-cyan-500">{'//'}</span> Education
+                      </h3>
+                      <div className="space-y-4">
+                        {education.map((edu, i) => (
+                          <div key={i} className="text-sm text-gray-300">
+                            <div className="font-bold text-white mb-1">{edu.degree}</div>
+                            <div className="text-cyan-400">{edu.school}</div>
+                            <div className="text-gray-500 font-mono text-xs mt-1">{edu.year}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column (Summary & Experience) - 8 cols */}
+                  <div className="col-span-8 space-y-10">
+                    {/* Summary */}
+                    <div>
+                      <h3 className="text-lg font-bold text-cyan-400 uppercase mb-4 flex items-center gap-2">
+                        <span className="text-cyan-500">{'//'}</span> About Me
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed text-base">
+                        {summary}
+                      </p>
+                    </div>
+
+                    {/* Experience */}
+                    <div>
+                      <h3 className="text-lg font-bold text-cyan-400 uppercase mb-4 flex items-center gap-2">
+                        <span className="text-cyan-500">{'//'}</span> Experience
+                      </h3>
+                      <div className="space-y-8 relative before:absolute before:left-0 before:top-2 before:bottom-0 before:w-0.5 before:bg-slate-800 before:content-[''] pl-8">
+                        {experiences.map((exp, i) => (
+                          <div key={i} className="relative">
+                            <div className="absolute -left-[37px] top-1.5 w-3 h-3 rounded-full bg-cyan-500 border-2 border-slate-900 shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
+                            <div className="mb-3">
+                              <h4 className="text-xl font-bold text-white mb-1">{exp.title}</h4>
+                              <div className="flex items-center gap-3 text-sm font-mono">
+                                <span className="text-cyan-400">{exp.company}</span>
+                                <span className="text-slate-600">|</span>
+                                <span className="text-slate-400">{exp.period}</span>
+                              </div>
+                            </div>
+                            <ul className="space-y-2">
+                              {exp.bullets.map((bullet, j) => (
+                                <li key={j} className="text-gray-400 text-sm pl-4 relative before:absolute before:left-0 before:top-2.5 before:w-1 before:h-1 before:bg-slate-600 before:rounded-full">
+                                  {bullet}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

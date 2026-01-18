@@ -32,7 +32,6 @@ export default function Templates() {
     // Map template IDs to their routes
     const templateRoutes = {
       1: '/professional-classic',
-      2: '/modern-minimalist',
       3: '/creative-bold',
       4: '/executive-summary',
       5: '/tech-professional',

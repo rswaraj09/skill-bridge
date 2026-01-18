@@ -82,14 +82,12 @@ export default function ModernMinimalist() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Modern Minimalist Resume</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* LEFT: FORM */}
-          <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* LEFT: FORM SIDEBAR */}
+        <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
+          <div className="p-6 space-y-6 text-gray-900">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-neutral-100 rounded-lg border-2 border-neutral-400">
               <h3 className="text-lg font-bold text-neutral-900 mb-4">Profile Photo</h3>
@@ -99,7 +97,7 @@ export default function ModernMinimalist() {
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-neutral-300 flex items-center justify-center text-4xl">✦</div>
                 )}
-                <label className="cursor-pointer bg-neutral-700 text-white px-4 py-2 rounded hover:bg-neutral-800 transition block text-center font-semibold">
+                <label className="cursor-pointer bg-neutral-700 text-white px-4 py-2 rounded hover:bg-neutral-800 transition block text-center font-semibold w-full">
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                   Upload Photo
                 </label>
@@ -129,17 +127,11 @@ export default function ModernMinimalist() {
                   <h3 className="text-xl font-bold">Key Skills</h3>
                   <button onClick={addSkill} className="text-sm bg-neutral-700 text-white px-3 py-1 rounded">+ Add</button>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {skills.map((skill, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between items-center mb-2">
-                        <input type="text" value={skill.name} onChange={(e) => updateSkillName(index, e.target.value)} placeholder="Skill name" className="flex-1 border border-neutral-300 rounded px-2 py-1 text-sm font-medium" />
-                        <button onClick={() => removeSkill(index)} className="text-red-600 ml-2">✕</button>
-                      </div>
-                      <div className="flex gap-2 items-center">
-                        <input type="range" min="0" max="100" value={skill.percentage} onChange={(e) => updateSkillPercentage(index, parseInt(e.target.value))} className="flex-1 h-2 bg-neutral-300 rounded-lg appearance-none cursor-pointer" />
-                        <span className="text-sm font-semibold text-neutral-700 w-12 text-right">{skill.percentage}%</span>
-                      </div>
+                    <div key={index} className="flex gap-2">
+                      <input type="text" value={skill.name} onChange={(e) => updateSkillName(index, e.target.value)} className="flex-1 border border-neutral-300 rounded px-2 py-1 text-sm" />
+                      <button onClick={() => removeSkill(index)} className="text-red-600">✕</button>
                     </div>
                   ))}
                 </div>
@@ -150,55 +142,26 @@ export default function ModernMinimalist() {
                   <h3 className="text-xl font-bold">Professional Experience</h3>
                   <button onClick={addExperience} className="text-sm bg-neutral-700 text-white px-3 py-1 rounded">+ Add</button>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {experiences.map((exp, i) => (
-                    <div key={i} className="border border-neutral-300 rounded p-4 bg-neutral-50">
-                      <input type="text" value={exp.period} onChange={(e) => { const newExps = [...experiences]; newExps[i].period = e.target.value; setExperiences(newExps); }} placeholder="Period (e.g., 2020 - Present)" className="w-full border border-neutral-300 rounded px-2 py-1 text-sm mb-2 font-semibold" />
+                    <div key={i} className="border border-neutral-300 rounded p-3 bg-neutral-50">
                       <input type="text" value={exp.title} onChange={(e) => { const newExps = [...experiences]; newExps[i].title = e.target.value; setExperiences(newExps); }} placeholder="Position" className="w-full border border-neutral-300 rounded px-2 py-1 text-sm mb-2" />
                       <input type="text" value={exp.company} onChange={(e) => { const newExps = [...experiences]; newExps[i].company = e.target.value; setExperiences(newExps); }} placeholder="Company" className="w-full border border-neutral-300 rounded px-2 py-1 text-sm mb-2" />
-                      <input type="text" value={exp.location} onChange={(e) => { const newExps = [...experiences]; newExps[i].location = e.target.value; setExperiences(newExps); }} placeholder="Location" className="w-full border border-neutral-300 rounded px-2 py-1 text-sm mb-3" />
-                      <div className="mb-2">
-                        <label className="text-xs font-semibold text-neutral-600">Achievements</label>
-                        {exp.bullets.map((bullet, j) => (
-                          <input key={j} type="text" value={bullet} onChange={(e) => { const newExps = [...experiences]; newExps[i].bullets[j] = e.target.value; setExperiences(newExps); }} placeholder="Achievement" className="w-full border border-neutral-300 rounded px-2 py-1 text-sm mb-1" />
-                        ))}
-                      </div>
-                      <button onClick={() => removeExperience(i)} className="text-red-600 text-sm font-semibold">Remove</button>
+                      <button onClick={() => removeExperience(i)} className="text-red-600 text-sm">Remove</button>
                     </div>
                   ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold mb-4">Education</h3>
-                <div className="space-y-3">
-                  {education.map((edu, i) => (
-                    <div key={i} className="border border-neutral-300 rounded p-3 bg-neutral-50">
-                      <input type="text" value={edu.degree} onChange={(e) => { const newEdu = [...education]; newEdu[i].degree = e.target.value; setEducation(newEdu); }} placeholder="Degree" className="w-full border border-neutral-300 rounded px-2 py-1 text-sm mb-2" />
-                      <input type="text" value={edu.school} onChange={(e) => { const newEdu = [...education]; newEdu[i].school = e.target.value; setEducation(newEdu); }} placeholder="School/University" className="w-full border border-neutral-300 rounded px-2 py-1 text-sm mb-2" />
-                      <input type="text" value={edu.year} onChange={(e) => { const newEdu = [...education]; newEdu[i].year = e.target.value; setEducation(newEdu); }} placeholder="Year" className="w-full border border-neutral-300 rounded px-2 py-1 text-sm" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold mb-4">Certifications</h3>
-                <div className="space-y-2">
-                  {certifications.map((cert, i) => (
-                    <div key={i} className="flex gap-2">
-                      <input type="text" value={cert} onChange={(e) => { const newCerts = [...certifications]; newCerts[i] = e.target.value; setCertifications(newCerts); }} placeholder="Certification" className="flex-1 border border-neutral-300 rounded px-2 py-1 text-sm" />
-                      <button onClick={() => setCertifications(certifications.filter((_, j) => j !== i))} className="text-red-600">✕</button>
-                    </div>
-                  ))}
-                  <button onClick={() => setCertifications([...certifications, 'New Certification'])} className="text-sm bg-neutral-700 text-white px-3 py-1 rounded">+ Add Cert</button>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT: PREVIEW */}
-          <div className="bg-white rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8 border-t-2 border-neutral-900">
+        {/* RIGHT: A4 PREVIEW */}
+        <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
+          <div
+            className="bg-white shadow-2xl overflow-hidden relative border-t-2 border-neutral-900"
+            style={{ width: '210mm', minHeight: '297mm' }}
+          >
             <div className="p-12 space-y-8">
               {/* Header */}
               <div className="space-y-4">

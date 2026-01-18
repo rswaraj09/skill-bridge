@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import passport from 'passport';
 
 const router = express.Router();
 
@@ -131,9 +132,9 @@ router.post('/login', async (req, res) => {
 router.get('/users', async (req, res) => {
   try {
     const users = await User.find().select('-password');
-    
+
     console.log('📋 All users:', users);
-    
+
     res.status(200).json({
       success: true,
       count: users.length,
@@ -146,5 +147,75 @@ router.get('/users', async (req, res) => {
     });
   }
 });
+
+// Middleware to verify token
+const protect = async (req, res, next) => {
+  let token;
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_secret_key');
+      req.user = await User.findById(decoded.id).select('-password');
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(401).json({ success: false, message: 'Not authorized, token failed' });
+    }
+  }
+
+  if (!token) {
+    res.status(401).json({ success: false, message: 'Not authorized, no token' });
+  }
+};
+
+// @route   GET /api/auth/me
+// @desc    Get current logged in user
+// @access  Private
+router.get('/me', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: user._id,
+        full_name: user.full_name,
+        email: user.email,
+        avatar: user.avatar
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Helper to generate token and redirect
+const handleSocialAuthCallback = (req, res) => {
+  const token = generateToken(req.user._id);
+  // Redirect to frontend with token
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  res.redirect(`${frontendUrl}/auth-success?token=${token}`);
+};
+
+// @route   GET /api/auth/google
+// @desc    Auth with Google
+// @access  Public
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// @route   GET /api/auth/google/callback
+// @desc    Google auth callback
+// @access  Public
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login', session: false }),
+  (req, res) => handleSocialAuthCallback(req, res)
+);
 
 export default router;

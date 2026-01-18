@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
-import { FileText, BarChart3, RefreshCw, Layout, Briefcase, Target, Zap, Shield } from 'lucide-react';
+import { FileText, BarChart3, RefreshCw, Layout, Briefcase, Target, Shield } from 'lucide-react';
 
 // Import resume templates
 import CorporateProfessional from './templates/CorporateProfessional';
-import ModernMinimalist from './templates/ModernMinimalist';
+
 import TechProfessional from './templates/TechProfessional';
 import CreativeBold from './templates/CreativeBold';
 import ProfessionalClassic from './templates/ProfessionalClassic';
@@ -31,7 +31,7 @@ export default function Landing() {
 
   const resumes = [
     { name: 'Corporate Professional', component: CorporateProfessional, image: '/templates/Template1.jpeg' },
-    { name: 'Modern Minimalist', component: ModernMinimalist, image: '/templates/Template2.jpeg' },
+
     { name: 'Tech Professional', component: TechProfessional, image: '/templates/Template3.jpeg' },
     { name: 'Creative Bold', component: CreativeBold, image: '/templates/Template4.jpeg' },
     { name: 'Professional Classic', component: ProfessionalClassic, image: '/templates/Template5.jpeg' },
@@ -68,13 +68,13 @@ export default function Landing() {
       icon: <Target className="w-8 h-8" />,
       title: 'Job Description Match',
       description: 'See how well your resume matches specific job requirements',
-      image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=400&fit=crop'
+      image: '/gif4.gif'
     },
     {
       icon: <RefreshCw className="w-8 h-8" />,
       title: 'AI Resume Rewriter',
       description: 'Transform your resume with GPT-5.2 powered rewriting',
-      image: 'https://images.unsplash.com/photo-1516321725247-7a59dc4d731c?w=400&h=400&fit=crop'
+      image: '/gif5.gif'
     },
     {
       icon: <Layout className="w-8 h-8" />,
@@ -86,13 +86,7 @@ export default function Landing() {
       icon: <Briefcase className="w-8 h-8" />,
       title: 'Jobs & Internships',
       description: 'Browse and apply to curated opportunities',
-      image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop'
-    },
-    {
-      icon: <Zap className="w-8 h-8" />,
-      title: 'Real-time Tracking',
-      description: 'Track all your applications in one place',
-      image: 'https://images.unsplash.com/photo-1516321725247-7a59dc4d731c?w=400&h=400&fit=crop'
+      image: '/gif6.gif'
     }
   ];
 
@@ -115,7 +109,7 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.4 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold text-white leading-tight"
+                className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold text-gray-900 dark:text-white leading-tight"
               >
                 The CV that gets
                 <span className="text-cyan-400"> the job... done</span>
@@ -124,9 +118,9 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
-                className="text-lg text-gray-300 max-w-xl"
+                className="text-lg text-gray-600 dark:text-gray-300 max-w-xl"
               >
-                Build a new CV or improve your existing one with step-by-step expert guidance.
+                Build a new CV or improve your existing one with step-by-step AI guidance.
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -149,9 +143,10 @@ export default function Landing() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6, duration: 0.4 }}
-                className="flex items-center pt-4"
+                className="flex flex-col pt-4 space-y-1"
               >
-                <span className="text-sm text-muted-foreground">🤖 AI-powered</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">AI-Guided Resume Builder & Opportunity Finder</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Build Your Resume. Discover Opportunities.</span>
               </motion.div>
             </div>
 
@@ -225,10 +220,10 @@ export default function Landing() {
       <section className="py-20 px-4" data-testid="features-section">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-gray-900 dark:text-white mb-4">
               Everything You Need to Get Hired
             </h2>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               From resume optimization to job applications, we've got you covered
             </p>
           </div>
@@ -246,8 +241,8 @@ export default function Landing() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4 }}
-                src={features[activeFeature].image}
-                alt={features[activeFeature].title}
+                src={features[activeFeature]?.image || features[0].image}
+                alt={features[activeFeature]?.title || features[0].title}
                 className="w-full h-full object-cover rounded-lg shadow-lg"
               />
             </motion.div>
@@ -263,8 +258,8 @@ export default function Landing() {
                   transition={{ delay: index * 0.1, duration: 0.4 }}
                   onMouseEnter={() => setActiveFeature(index)}
                   className={`p-6 rounded-lg transition-all duration-300 cursor-pointer ${activeFeature === index
-                      ? 'bg-white/10 backdrop-blur-md shadow-lg border border-white/20'
-                      : 'bg-white/5 hover:bg-white/10 border border-transparent'
+                    ? 'bg-white/10 backdrop-blur-md shadow-lg border border-white/20 dark:border-white/20 border-gray-200'
+                    : 'bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-transparent'
                     }`}
                   data-testid={`feature-card-${index}`}
                 >
@@ -275,7 +270,7 @@ export default function Landing() {
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-heading font-semibold text-white mb-2">
+                      <h3 className="text-lg font-heading font-semibold text-gray-900 dark:text-white mb-2">
                         {feature.title}
                       </h3>
                       {activeFeature === index && (
@@ -283,7 +278,7 @@ export default function Landing() {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           transition={{ duration: 0.3 }}
-                          className="text-gray-300 text-sm"
+                          className="text-gray-600 dark:text-gray-300 text-sm"
                         >
                           {feature.description}
                         </motion.p>
@@ -297,23 +292,23 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="py-12 px-4 border-t border-white/10" data-testid="footer">
+      <footer className="py-12 px-4 border-t border-gray-200 dark:border-white/10" data-testid="footer">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             {/* Contact Information */}
             <div>
-              <h3 className="font-heading font-semibold text-white mb-4">Contact Us</h3>
+              <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-4">Contact Us</h3>
               <div className="space-y-2 text-gray-400 text-sm">
                 <p>
-                  <span className="font-semibold text-gray-300">Address:</span><br />
+                  <span className="font-semibold text-gray-700 dark:text-gray-300">Address:</span><br />
                   123 Career Street, Tech City, TC 12345
                 </p>
                 <p>
-                  <span className="font-semibold text-gray-300">Phone:</span><br />
+                  <span className="font-semibold text-gray-700 dark:text-gray-300">Phone:</span><br />
                   <a href="tel:+1234567890" className="hover:text-cyan-400 transition-colors">+1 (234) 567-890</a>
                 </p>
                 <p>
-                  <span className="font-semibold text-gray-300">Email:</span><br />
+                  <span className="font-semibold text-gray-700 dark:text-gray-300">Email:</span><br />
                   <a href="mailto:support@skillbridge.com" className="hover:text-cyan-400 transition-colors">support@skillbridge.com</a>
                 </p>
               </div>
@@ -321,7 +316,7 @@ export default function Landing() {
 
             {/* Company Info */}
             <div>
-              <h3 className="font-heading font-semibold text-white mb-4">About Skill Bridge</h3>
+              <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-4">About Skill Bridge</h3>
               <p className="text-gray-400 text-sm">
                 We empower job seekers with AI-powered resume optimization and job matching tools to land their dream careers.
               </p>
@@ -329,7 +324,7 @@ export default function Landing() {
 
             {/* Quick Links */}
             <div>
-              <h3 className="font-heading font-semibold text-white mb-4">Quick Links</h3>
+              <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><Link to="/" className="hover:text-cyan-400 transition-colors">Home</Link></li>
                 <li><Link to="/jobs" className="hover:text-cyan-400 transition-colors">Browse Jobs</Link></li>
@@ -340,7 +335,7 @@ export default function Landing() {
           </div>
 
           {/* Copyright */}
-          <div className="border-t border-white/10 pt-8 text-center text-gray-500 text-sm">
+          <div className="border-t border-gray-200 dark:border-white/10 pt-8 text-center text-gray-500 text-sm">
             <p>&copy; 2025 Skill Bridge. All rights reserved. | Empowering careers with AI.</p>
           </div>
         </div>
