@@ -34,6 +34,7 @@ import InfographicStyle from './pages/templates/InfographicStyle';
 import ModernMinimalist from './pages/ModernMinimalist';
 import CreativeDesigner from './pages/CreativeDesigner';
 import { useAuth } from './context/AuthContext';
+import { BackgroundLayout } from './components/BackgroundLayout';
 import '@/App.css';
 
 const PrivateRoute = ({ children }) => {
@@ -91,11 +92,12 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="App">
-          <div className="noise-texture" />
-          <AppRoutes />
-          <Toaster position="top-right" />
-        </div>
+        <BackgroundLayout>
+          <div className="App">
+            <AppRoutes />
+            <Toaster position="top-right" />
+          </div>
+        </BackgroundLayout>
       </BrowserRouter>
     </AuthProvider>
   );

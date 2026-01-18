@@ -6,7 +6,7 @@ module.exports = {
     './components/**/*.{js,jsx}',
     './app/**/*.{js,jsx}',
     './src/**/*.{js,jsx}',
-	],
+  ],
   prefix: "",
   theme: {
     container: {
@@ -18,8 +18,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        heading: ['Inter', 'sans-serif'],
+        body: ['"Exo 2"', 'sans-serif'],
+        heading: ['Orbitron', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

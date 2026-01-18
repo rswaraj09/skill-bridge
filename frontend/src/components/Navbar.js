@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { FileText, BarChart3, RefreshCw, Layout, Briefcase, FolderOpen, User, LogOut, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
-export const Navbar = () => {
+export const Navbar = ({ darkMode = true }) => {
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,24 +26,27 @@ export const Navbar = () => {
     { to: '/applications', label: 'Applications', icon: <FolderOpen className="w-4 h-4" /> },
   ] : [];
 
+  const navClass = 'bg-black/20 border-b border-white/10 sticky top-0 z-50 backdrop-blur-md transition-all duration-300';
+
   return (
-    <nav className="glassmorphism border-b border-stone-200 sticky top-0 z-40">
+    <nav className={navClass}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <Link to="/" className="flex items-center space-x-2" data-testid="logo-link">
-            <div className="w-10 h-10 bg-primary rounded-sm flex items-center justify-center">
-              <span className="text-white font-heading font-bold text-xl">SB</span>
+          <Link to="/" className="flex items-center space-x-3 group" data-testid="logo-link">
+            <div className="w-10 h-10 bg-cyan-900/30 border border-cyan-500/30 rounded-lg flex items-center justify-center group-hover:bg-cyan-900/50 transition-colors">
+              <span className="text-cyan-400 font-heading font-bold text-xl">SB</span>
             </div>
-            <span className="font-heading font-bold text-xl text-foreground">Skill Builder</span>
+            <span className="font-heading font-bold text-xl text-white tracking-wide group-hover:text-cyan-400 transition-colors">Skill Builder</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => (
               <Link key={link.to} to={link.to}>
                 <Button
-                  variant={location.pathname === link.to ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
-                  className="flex items-center space-x-2"
+                  className={`font-body flex items-center space-x-2 text-gray-300 hover:text-cyan-400 hover:bg-white/5 ${location.pathname === link.to ? 'text-cyan-400 bg-white/5' : ''
+                    }`}
                   data-testid={`nav-${link.label.toLowerCase()}`}
                 >
                   {link.icon}
@@ -53,16 +56,22 @@ export const Navbar = () => {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <>
                 <Link to="/profile">
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2" data-testid="profile-button">
+                  <Button variant="ghost" size="sm" className="font-body flex items-center space-x-2 text-gray-300 hover:text-cyan-400 hover:bg-white/5" data-testid="profile-button">
                     <User className="w-4 h-4" />
                     <span>{user?.full_name?.split(' ')[0] || 'Profile'}</span>
                   </Button>
                 </Link>
-                <Button onClick={handleLogout} variant="outline" size="sm" data-testid="logout-button">
+                <Button
+                  onClick={handleLogout}
+                  variant="outline"
+                  size="sm"
+                  className="font-body border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 bg-transparent"
+                  data-testid="logout-button"
+                >
                   <LogOut className="w-4 h-4 mr-2" />
                   Logout
                 </Button>
@@ -70,10 +79,10 @@ export const Navbar = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm" data-testid="login-button">Login</Button>
+                  <Button variant="ghost" size="sm" className="font-heading text-white hover:text-cyan-400 hover:bg-white/5" data-testid="login-button">Login</Button>
                 </Link>
                 <Link to="/signup">
-                  <Button size="sm" className="btn-primary" data-testid="signup-button">Get Started</Button>
+                  <Button size="sm" className="font-heading bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-full px-6" data-testid="signup-button">Get Started</Button>
                 </Link>
               </>
             )}
@@ -81,15 +90,15 @@ export const Navbar = () => {
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="sm">
-                <Menu className="w-5 h-5" />
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+                <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-64">
+            <SheetContent side="right" className="w-64 bg-[#0a0a2a] border-l border-white/10 text-white">
               <div className="flex flex-col space-y-4 mt-8">
                 {navLinks.map((link) => (
                   <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start flex items-center space-x-2">
+                    <Button variant="ghost" className="w-full justify-start flex items-center space-x-2 text-gray-300 hover:text-cyan-400 hover:bg-white/5 font-body">
                       {link.icon}
                       <span>{link.label}</span>
                     </Button>
@@ -97,13 +106,13 @@ export const Navbar = () => {
                 ))}
                 {isAuthenticated && (
                   <>
-                    <hr className="border-stone-200" />
+                    <hr className="border-white/10" />
                     <Link to="/profile" onClick={() => setMobileOpen(false)}>
-                      <Button variant="ghost" className="w-full justify-start">
+                      <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-cyan-400 hover:bg-white/5 font-body">
                         <User className="w-4 h-4 mr-2" /> Profile
                       </Button>
                     </Link>
-                    <Button onClick={() => { handleLogout(); setMobileOpen(false); }} variant="outline" className="w-full justify-start">
+                    <Button onClick={() => { handleLogout(); setMobileOpen(false); }} variant="outline" className="w-full justify-start border-red-500/30 text-red-400 hover:bg-red-500/10 bg-transparent font-body">
                       <LogOut className="w-4 h-4 mr-2" /> Logout
                     </Button>
                   </>
@@ -111,10 +120,10 @@ export const Navbar = () => {
                 {!isAuthenticated && (
                   <>
                     <Link to="/login" onClick={() => setMobileOpen(false)}>
-                      <Button variant="ghost" className="w-full">Login</Button>
+                      <Button variant="ghost" className="w-full text-white hover:text-cyan-400 font-heading">Login</Button>
                     </Link>
                     <Link to="/signup" onClick={() => setMobileOpen(false)}>
-                      <Button className="w-full btn-primary">Get Started</Button>
+                      <Button className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-full font-heading">Get Started</Button>
                     </Link>
                   </>
                 )}
