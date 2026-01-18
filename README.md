@@ -66,5 +66,5 @@ Skill Bridge is a modern **MERN + AI** powered platform designed to optimize the
    npm start
    ```
 
-## 🤝 Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
+
+
