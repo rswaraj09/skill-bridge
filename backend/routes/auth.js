@@ -2,6 +2,7 @@ import express from 'express';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
+import { sendLoginEmail } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -107,6 +108,9 @@ router.post('/login', async (req, res) => {
 
     console.log(`✅ User logged in: ${email}`);
 
+    // Send login notification email
+    sendLoginEmail(user.email, user.full_name);
+
     res.status(200).json({
       success: true,
       message: 'User logged in successfully',
@@ -201,6 +205,12 @@ const handleSocialAuthCallback = (req, res) => {
   const token = generateToken(req.user._id);
   // Redirect to frontend with token
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+  // Send login notification email
+  if (req.user) {
+    sendLoginEmail(req.user.email, req.user.full_name);
+  }
+
   res.redirect(`${frontendUrl}/auth-success?token=${token}`);
 };
 

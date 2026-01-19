@@ -7,6 +7,7 @@ import resumeRoutes from './routes/resumes.js';
 import jobRoutes from './routes/jobs.js';
 import applicationRoutes from './routes/applications.js';
 import templateRoutes from './routes/templates.js';
+import chatRoutes from './routes/chat.js';
 
 // Load environment variables
 dotenv.config();
@@ -17,6 +18,8 @@ const app = express();
 connectDB();
 
 import passport from './config/passport.js'; // Import passport config
+
+import protect from './middleware/auth.js';
 
 // Middleware
 app.use(cors({
@@ -31,11 +34,12 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/resumes', resumeRoutes);
-app.use('/api/jobs', jobRoutes);
-app.use('/api/applications', applicationRoutes);
-app.use('/api/templates', templateRoutes);
+app.use('/api/auth', authRoutes); // Public routes (Login, Signup)
+app.use('/api/resumes', protect, resumeRoutes); // Protected routes
+app.use('/api/jobs', protect, jobRoutes); // Protected routes
+app.use('/api/applications', protect, applicationRoutes); // Protected routes
+app.use('/api/templates', protect, templateRoutes); // Protected routes
+app.use('/api/chat', chatRoutes); // Temporary: Public chat route for verification
 
 // Basic route
 app.get('/', (req, res) => {

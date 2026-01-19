@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Navbar } from '../components/Navbar';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+import { Download } from 'lucide-react';
 
 export default function CreativeDesigner() {
   const [name, setName] = useState('DANIEL JONES');
   const [title, setTitle] = useState('Photographer');
   const [summary, setSummary] = useState('Experienced and innovative photographer bringing forth a true passion for capturing life\'s moments through a lens. Connected to the ultimate satisfaction of a client, and apt in the use of modern photography software and techniques. Bringing forth five years of experience working as a Freelance Photographer on over 200 projects.');
-  
+
   const [phone, setPhone] = useState('(123) 456-7890');
   const [email, setEmail] = useState('daniel.jones@email.com');
   const [address, setAddress] = useState('Vancouver, BC V6J 2N5, Canada');
@@ -124,17 +127,39 @@ export default function CreativeDesigner() {
     setExperiences(newExps);
   };
 
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('resume-preview');
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('resume.pdf');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Creative Designer Resume</h1>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* LEFT: FORM */}
           <div className="bg-white rounded-lg shadow p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-2xl font-bold mb-6">Edit Your Resume</h2>
-            
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Edit Your Resume</h2>
+              <button
+                onClick={handleDownloadPDF}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow flex items-center gap-2 text-sm font-medium transition-colors"
+                title="Download as PDF"
+              >
+                <Download className="w-4 h-4" /> Export PDF
+              </button>
+            </div>
+
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
               <h3 className="text-lg font-bold mb-4 pb-2 border-b-2 border-blue-600">Profile Photo</h3>
@@ -505,8 +530,10 @@ export default function CreativeDesigner() {
           </div>
 
           {/* RIGHT: PREVIEW */}
-          <div className="bg-white rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100">
+          <div
+            className="bg-white rounded-lg shadow overflow-hidden max-h-[calc(100vh-200px)] overflow-y-auto sticky top-8"
+          >
+            <div id="resume-preview" className="bg-gradient-to-br from-blue-50 to-blue-100">
               <div className="grid grid-cols-4 gap-0 min-h-screen">
                 {/* Left Sidebar */}
                 <div className="col-span-1 bg-gradient-to-b from-blue-50 to-blue-100 p-4 space-y-6 border-r border-blue-200">

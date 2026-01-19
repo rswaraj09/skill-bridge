@@ -11,9 +11,10 @@ import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { jobService, applicationService, resumeService } from '../services/api';
 import { toast } from 'sonner';
-import { Briefcase, MapPin, Clock, IndianRupee, Loader2, Send } from 'lucide-react';
+import { Briefcase, MapPin, Clock, IndianRupee, Loader2, Send, Upload, Search, ExternalLink } from 'lucide-react';
 
 export default function JobsBoard() {
+  /* Jobs Logic Removed as per requirement
   const [jobs, setJobs] = useState([]);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,59 +23,37 @@ export default function JobsBoard() {
   const [selectedResume, setSelectedResume] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
   const [applying, setApplying] = useState(false);
-
+  
   useEffect(() => {
-    fetchJobs();
-    fetchResumes();
+    fetchJobs(); // Removed
+    fetchResumes(); // Removed
   }, [category]);
+  */
 
-  const fetchJobs = async () => {
-    setLoading(true);
+  /* Helper functions removed as they are no longer used
+  const fetchJobs = async () => { ... }
+  const fetchResumes = async () => { ... }
+  const handleApply = async () => { ... }
+  */
+
+  const [scanning, setScanning] = useState(false);
+  const [keywordResults, setKeywordResults] = useState(null);
+
+  const handleScanResume = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setScanning(true);
+    setKeywordResults(null);
     try {
-      const response = await jobService.getAll(category);
-      // Handle both array and object response formats
-      const jobsData = Array.isArray(response.data) ? response.data : response.data?.jobs || response.data?.data || [];
-      setJobs(jobsData);
+      const response = await resumeService.extractKeywords(file);
+      setKeywordResults(response.data.data);
+      toast.success('Resume analyzed for job keywords!');
     } catch (error) {
-      toast.error('Failed to load jobs');
-      setJobs([]);
+      toast.error('Failed to scan resume');
+      console.error(error);
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchResumes = async () => {
-    try {
-      const response = await resumeService.getAll();
-      // Handle both array and object response formats
-      const resumesData = Array.isArray(response.data) ? response.data : response.data?.resumes || response.data?.data || [];
-      setResumes(resumesData);
-    } catch (error) {
-      console.error('Failed to load resumes');
-      setResumes([]);
-    }
-  };
-
-  const handleApply = async () => {
-    if (!selectedResume) {
-      toast.error('Please select a resume');
-      return;
-    }
-    setApplying(true);
-    try {
-      await applicationService.create({
-        job_id: selectedJob.id,
-        resume_id: selectedResume,
-        cover_letter: coverLetter || null
-      });
-      toast.success('Application submitted successfully!');
-      setSelectedJob(null);
-      setSelectedResume('');
-      setCoverLetter('');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Application failed');
-    } finally {
-      setApplying(false);
+      setScanning(false);
     }
   };
 
@@ -96,115 +75,90 @@ export default function JobsBoard() {
             </p>
           </div>
 
-          <Tabs defaultValue="all" className="mb-8" onValueChange={(v) => setCategory(v === 'all' ? null : v)}>
-            <TabsList data-testid="category-tabs">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="internship">Internships</TabsTrigger>
-              <TabsTrigger value="job">Jobs</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          {/* Resume Scan Section */}
+          <Card className="p-6 mb-8 border-primary/20 bg-primary/5">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+              <div className="flex-1">
+                <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+                  <Search className="w-5 h-5 text-primary" />
+                  Find Jobs Matching Your Resume
+                </h2>
+                <p className="text-muted-foreground mb-4">
+                  Upload your resume to automatically find relevant opportunities across major job platforms.
+                </p>
+                <div className="flex items-center gap-4">
+                  <label className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium flex items-center gap-2 transition-colors">
+                    {scanning ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
+                    )}
+                    {scanning ? 'Scanning Resume...' : 'Upload Resume & Scan'}
+                    <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={handleScanResume} disabled={scanning} />
+                  </label>
+                </div>
+              </div>
 
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="w-12 h-12 animate-spin text-primary" />
-            </div>
-          ) : !Array.isArray(jobs) || jobs.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">No jobs found. Try a different category.</p>
-            </div>
-          ) : (
-            <div className="grid gap-6">
-              {jobs.map((job, index) => (
-                <motion.div
-                  key={job.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.4 }}
-                >
-                  <Card className="p-6 hover:shadow-lg transition-all" data-testid={`job-card-${index}`}>
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 bg-primary rounded-sm flex items-center justify-center flex-shrink-0">
-                            <Briefcase className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-xl font-heading font-semibold text-foreground mb-2">{job.title}</h3>
-                            <p className="text-lg font-medium text-primary mb-3">{job.company}</p>
-                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-3">
-                              <div className="flex items-center">
-                                <MapPin className="w-4 h-4 mr-1" />
-                                {job.location}
-                              </div>
-                              <div className="flex items-center">
-                                <Clock className="w-4 h-4 mr-1" />
-                                {job.job_type}
-                              </div>
-                              {(job.stipend || job.salary) && (
-                                <div className="flex items-center font-medium text-foreground">
-                                  <IndianRupee className="w-4 h-4 mr-1" />
-                                  {job.stipend || job.salary}
-                                </div>
-                              )}
-                            </div>
-                            <p className="text-muted-foreground mb-3">{job.description}</p>
-                            <div className="flex flex-wrap gap-2">
-                              {job.requirements?.slice(0, 4).map((req, i) => (
-                                <Badge key={i} variant="outline">{req}</Badge>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <Dialog open={selectedJob?.id === job.id} onOpenChange={(open) => !open && setSelectedJob(null)}>
-                        <DialogTrigger asChild>
-                          <Button onClick={() => setSelectedJob(job)} data-testid={`apply-button-${index}`}>
-                            Apply Now
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent data-testid="apply-dialog">
-                          <DialogHeader>
-                            <DialogTitle>Apply to {job.title}</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4 py-4">
-                            <div>
-                              <Label>Select Resume</Label>
-                              <Select value={selectedResume} onValueChange={setSelectedResume}>
-                                <SelectTrigger className="mt-2" data-testid="resume-select">
-                                  <SelectValue placeholder="Choose a resume" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {resumes.map((resume) => (
-                                    <SelectItem key={resume.id} value={resume.id}>{resume.title}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div>
-                              <Label>Cover Letter (Optional)</Label>
-                              <Textarea
-                                placeholder="Write a brief cover letter..."
-                                value={coverLetter}
-                                onChange={(e) => setCoverLetter(e.target.value)}
-                                className="mt-2 min-h-[120px]"
-                                data-testid="cover-letter-input"
-                              />
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <Button onClick={handleApply} disabled={applying} data-testid="submit-application-button">
-                              {applying ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
-                              Submit Application
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
+              {keywordResults && (
+                <div className="flex-1 w-full bg-background rounded-lg p-4 border shadow-sm">
+                  <div className="mb-3">
+                    <span className="text-sm font-semibold text-muted-foreground">Detected Role:</span>
+                    <div className="font-bold text-lg text-primary">{keywordResults.role || 'Job Seeker'}</div>
+                  </div>
+                  <div className="mb-4">
+                    <span className="text-sm font-semibold text-muted-foreground">Top Skills:</span>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {keywordResults.skills?.map((skill, i) => (
+                        <Badge key={i} variant="secondary">{skill}</Badge>
+                      ))}
                     </div>
-                  </Card>
-                </motion.div>
-              ))}
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                      onClick={() => {
+                        const query = `${keywordResults.role} ${keywordResults.skills?.slice(0, 2).join(' ')}`;
+                        window.open(`https://internshala.com/internships/keywords-${query.replace(/\s+/g, '-')}`, '_blank');
+                      }}
+                    >
+                      Internshala <ExternalLink className="w-3 h-3 ml-2" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                      onClick={() => {
+                        const query = `${keywordResults.role} ${keywordResults.skills?.slice(0, 2).join(' ')}`;
+                        window.open(`https://www.naukri.com/${query.replace(/\s+/g, '-')}-jobs`, '_blank');
+                      }}
+                    >
+                      Naukri <ExternalLink className="w-3 h-3 ml-2" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                      onClick={() => {
+                        const query = `${keywordResults.role}`;
+                        window.open(`https://www.glassdoor.co.in/Job/jobs.htm?sc.keyword=${encodeURIComponent(query)}`, '_blank');
+                      }}
+                    >
+                      Glassdoor <ExternalLink className="w-3 h-3 ml-2" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                      onClick={() => {
+                        const query = `${keywordResults.role}`;
+                        window.open(`https://unstop.com/opportunities?searchTerm=${encodeURIComponent(query)}`, '_blank');
+                      }}
+                    >
+                      Unstop <ExternalLink className="w-3 h-3 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </Card>
         </motion.div>
       </div>
     </div>

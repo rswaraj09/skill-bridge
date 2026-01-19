@@ -82,6 +82,15 @@ export const resumeService = {
   getAll: () => api.get('/resumes'),
   getOne: (id) => api.get(`/resumes/${id}`),
   delete: (id) => api.delete(`/resumes/${id}`),
+  extractKeywords: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/resumes/extract-keywords', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
 };
 
 export const jobService = {

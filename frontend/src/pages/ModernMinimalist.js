@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Card } from '../components/ui/card';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function ModernMinimalist() {
   const [name, setName] = useState('SARAH CHEN');
@@ -9,9 +11,9 @@ export default function ModernMinimalist() {
   const [address, setAddress] = useState('San Francisco, CA 94102');
   const [website, setWebsite] = useState('sarahchen.design');
   const [linkedin, setLinkedin] = useState('linkedin.com/in/sarah.chen');
-  
+
   const [summary, setSummary] = useState('Product Designer with 6+ years of experience in UX/UI design, user research, and design systems. Passionate about creating intuitive digital experiences that solve real user problems.');
-  
+
   const [skills, setSkills] = useState([
     { name: 'UI/UX Design', percentage: 95 },
     { name: 'Figma', percentage: 90 },
@@ -20,7 +22,7 @@ export default function ModernMinimalist() {
     { name: 'Adobe Creative Suite', percentage: 80 },
     { name: 'Design Systems', percentage: 90 }
   ]);
-  
+
   const [experiences, setExperiences] = useState([
     {
       period: 'January 2021 - Present',
@@ -87,11 +89,24 @@ export default function ModernMinimalist() {
     setSkills(skills.filter((_, i) => i !== index));
   };
 
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('resume-preview');
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('resume.pdf');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Resume Preview */}
-        <div className="bg-white rounded-lg shadow-2xl overflow-hidden mb-8">
+        <div id="resume-preview" className="bg-white rounded-lg shadow-2xl overflow-hidden mb-8">
           {/* Header */}
           <div className="bg-white border-b-2 border-blue-500 px-8 py-6">
             <input
@@ -229,25 +244,25 @@ export default function ModernMinimalist() {
                   <input
                     type="text"
                     value={education.degree}
-                    onChange={(e) => setEducation({...education, degree: e.target.value})}
+                    onChange={(e) => setEducation({ ...education, degree: e.target.value })}
                     className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 focus:outline-none py-1 font-medium text-gray-800"
                   />
                   <input
                     type="text"
                     value={education.university}
-                    onChange={(e) => setEducation({...education, university: e.target.value})}
+                    onChange={(e) => setEducation({ ...education, university: e.target.value })}
                     className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 focus:outline-none py-1 text-gray-700"
                   />
                   <input
                     type="text"
                     value={education.graduation}
-                    onChange={(e) => setEducation({...education, graduation: e.target.value})}
+                    onChange={(e) => setEducation({ ...education, graduation: e.target.value })}
                     className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 focus:outline-none py-1 text-gray-700"
                   />
                   <input
                     type="text"
                     value={education.gpa}
-                    onChange={(e) => setEducation({...education, gpa: e.target.value})}
+                    onChange={(e) => setEducation({ ...education, gpa: e.target.value })}
                     className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 focus:outline-none py-1 text-gray-600 text-xs"
                   />
                 </div>
@@ -339,7 +354,7 @@ export default function ModernMinimalist() {
 
         {/* Action Buttons */}
         <div className="flex gap-4 justify-center">
-          <button className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-semibold">
+          <button onClick={handleDownloadPDF} className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-semibold">
             Download PDF
           </button>
           <button className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors text-sm font-semibold">

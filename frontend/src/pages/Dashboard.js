@@ -15,11 +15,11 @@ export default function Dashboard() {
 
 
   const features = [
-    { icon: <BarChart3 className="w-6 h-6" />, title: 'Analyze Resume', desc: 'Get ATS score', to: '/analyze', color: 'bg-blue-100 text-blue-600' },
-    { icon: <TrendingUp className="w-6 h-6" />, title: 'Job Match', desc: 'Match with jobs', to: '/match', color: 'bg-green-100 text-green-600' },
-    { icon: <RefreshCw className="w-6 h-6" />, title: 'Rewrite Resume', desc: 'AI-powered', to: '/rewrite', color: 'bg-purple-100 text-purple-600' },
-    { icon: <Layout className="w-6 h-6" />, title: 'Templates', desc: '10+ designs', to: '/templates', color: 'bg-orange-100 text-orange-600' },
-    { icon: <Briefcase className="w-6 h-6" />, title: 'Browse Jobs', desc: 'Find opportunities', to: '/jobs', color: 'bg-indigo-100 text-indigo-600' },
+    { icon: <BarChart3 className="w-6 h-6" />, title: 'Analyze Resume', desc: 'Get ATS score', to: '/analyze', color: 'bg-blue-100 text-blue-600', image: '/gif1.gif' },
+    { icon: <TrendingUp className="w-6 h-6" />, title: 'Job Match', desc: 'Match with jobs', to: '/match', color: 'bg-green-100 text-green-600', image: '/gif10.gif' },
+    { icon: <RefreshCw className="w-6 h-6" />, title: 'Rewrite Resume', desc: 'AI-powered', to: '/rewrite', color: 'bg-purple-100 text-purple-600', image: '/gif9.gif' },
+    { icon: <Layout className="w-6 h-6" />, title: 'Templates', desc: '10+ designs', to: '/templates', color: 'bg-orange-100 text-orange-600', image: '/gif8.gif' },
+    { icon: <Briefcase className="w-6 h-6" />, title: 'Browse Jobs', desc: 'Find opportunities', to: '/jobs', color: 'bg-indigo-100 text-indigo-600', image: '/gif7.gif' },
   ];
 
   return (
@@ -74,7 +74,7 @@ export default function Dashboard() {
                     <div className="flex-1 w-full max-w-md">
                       <div className="rounded-xl overflow-hidden shadow-lg border border-border/50 bg-muted/30">
                         <img
-                          src={`/gif${(index % 3) + 1}.gif`}
+                          src={feature.image}
                           alt={feature.title}
                           className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500"
                         />

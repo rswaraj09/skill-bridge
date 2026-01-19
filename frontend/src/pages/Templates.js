@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
@@ -11,6 +11,8 @@ import { Eye } from 'lucide-react';
 
 export default function Templates() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const rewrittenContent = location.state?.rewrittenContent;
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,6 +34,7 @@ export default function Templates() {
     // Map template IDs to their routes
     const templateRoutes = {
       1: '/professional-classic',
+      2: '/modern-minimalist',
       3: '/creative-bold',
       4: '/executive-summary',
       5: '/tech-professional',
@@ -52,9 +55,9 @@ export default function Templates() {
 
     const route = templateRoutes[template.id];
     if (route) {
-      navigate(route);
+      navigate(route, { state: { rewrittenContent } });
     } else {
-      navigate(`/template-editor?id=${template.id}&name=${encodeURIComponent(template.name)}`);
+      navigate(`/template-editor?id=${template.id}&name=${encodeURIComponent(template.name)}`, { state: { rewrittenContent } });
     }
   };
 

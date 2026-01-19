@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { jsPDF } from 'jspdf';
+
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -11,6 +14,7 @@ import { toast } from 'sonner';
 import { Loader2, RefreshCw, Copy, Download, Upload, FileText } from 'lucide-react';
 
 export default function ResumeRewriter() {
+  const navigate = useNavigate();
   const [jobDescription, setJobDescription] = useState('');
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeContent, setResumeContent] = useState('');
@@ -40,22 +44,19 @@ export default function ResumeRewriter() {
 
       // Analyze and rewrite resume with job description
       const response = await resumeService.matchJobFile(file, jobDescription);
-      
+
       setAnalysisReport(response.data);
-      
+
       // Extract job match percentage if available
-      if (response.data.analysis && response.data.analysis.includes('match')) {
-        const matchPercentage = response.data.analysis.match(/(\d+)%\s*match/i);
-        if (matchPercentage) {
-          setJobMatch(parseInt(matchPercentage[1]));
-        }
+      if (response.data.data && response.data.data.match_percentage) {
+        setJobMatch(response.data.data.match_percentage);
       }
-      
+
       // Generate rewritten resume with the job description alignment
       const rewriteResponse = await resumeService.rewrite(text, 'professional', jobDescription);
       setRewrittenContent(rewriteResponse.data.rewritten_content);
       setATSScore(rewriteResponse.data.ats_score);
-      
+
       const scoreEmoji = rewriteResponse.data.ats_score >= 95 ? '🎉' : rewriteResponse.data.ats_score >= 85 ? '✅' : '📝';
       toast.success(`${scoreEmoji} Resume rewritten! ATS Score: ${rewriteResponse.data.ats_score}%`);
     } catch (error) {
@@ -73,14 +74,26 @@ export default function ResumeRewriter() {
   };
 
   const handleDownload = () => {
-    const element = document.createElement('a');
-    const file = new Blob([rewrittenContent], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = 'rewritten_resume.txt';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    toast.success('Resume downloaded!');
+    const doc = new jsPDF();
+
+    // Set font size and type
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+
+    // Split text to fit page
+    // 180 is roughly the width of A4 (210mm) minus margins
+    const splitText = doc.splitTextToSize(rewrittenContent, 180);
+
+    // Add text to PDF with some margin
+    doc.text(splitText, 15, 15);
+
+    // Save PDF
+    doc.save('rewritten_resume.pdf');
+    toast.success('Resume downloaded as PDF!');
+  };
+
+  const handleUseTemplates = () => {
+    navigate('/templates', { state: { resumeContent: rewrittenContent } });
   };
 
   const templates = [
@@ -140,11 +153,10 @@ export default function ResumeRewriter() {
                     />
                     <label
                       htmlFor="resume-upload"
-                      className={`flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-                        loading || !jobDescription.trim()
-                          ? 'bg-muted border-muted-foreground/20 cursor-not-allowed'
-                          : 'bg-muted hover:bg-accent border-border hover:border-primary'
-                      }`}
+                      className={`flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${loading || !jobDescription.trim()
+                        ? 'bg-muted border-muted-foreground/20 cursor-not-allowed'
+                        : 'bg-muted hover:bg-accent border-border hover:border-primary'
+                        }`}
                     >
                       <div className="text-center">
                         <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
@@ -222,26 +234,31 @@ export default function ResumeRewriter() {
 
                   {analysisReport && (
                     <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className={`p-4 rounded-lg border-2 ${atsScore >= 95 ? 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700' : 'bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700'}`}>
+                      <div className={`p-4 rounded-lg border-2 ${atsScore && atsScore >= 85 ? 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700' : 'bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold text-sm">ATS Score</h3>
-                          <span className={`text-2xl font-bold ${atsScore >= 95 ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'}`}>
-                            {atsScore}%
+                          <span className={`text-2xl font-bold ${atsScore && atsScore >= 85 ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'}`}>
+                            {atsScore ? `${atsScore}%` : 'Analyzing...'}
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {atsScore >= 95 ? '✅ Excellent ATS Compatibility' : atsScore >= 85 ? '⚠️ Good ATS Score' : '📝 Needs Improvement'}
+                          {atsScore
+                            ? (atsScore >= 95 ? '✅ Excellent ATS Compatibility' : atsScore >= 85 ? '⚠️ Good ATS Score' : '📝 Needs Improvement')
+                            : '⏳ Calculating ATS score...'}
                         </p>
                       </div>
-                      <div className={`p-4 rounded-lg border-2 ${jobMatch && jobMatch >= 85 ? 'bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-700' : 'bg-amber-50 dark:bg-amber-950 border-amber-300 dark:border-amber-700'}`}>
+
+                      <div className={`p-4 rounded-lg border-2 ${jobMatch ? (jobMatch >= 85 ? 'bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-700' : 'bg-amber-50 dark:bg-amber-950 border-amber-300 dark:border-amber-700') : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold text-sm">Job Match</h3>
-                          <span className={`text-2xl font-bold ${jobMatch && jobMatch >= 85 ? 'text-purple-600 dark:text-purple-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                          <span className={`text-2xl font-bold ${jobMatch ? (jobMatch >= 85 ? 'text-purple-600 dark:text-purple-400' : 'text-amber-600 dark:text-amber-400') : 'text-gray-500'}`}>
                             {jobMatch ? `${jobMatch}%` : 'Analyzing...'}
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {jobMatch && jobMatch >= 85 ? '✅ Strong Alignment' : jobMatch && jobMatch >= 70 ? '⚠️ Good Fit' : '📝 Room for Improvement'}
+                          {jobMatch
+                            ? (jobMatch >= 85 ? '✅ Strong Alignment' : jobMatch >= 70 ? '⚠️ Good Fit' : '📝 Room for Improvement')
+                            : '⏳ Calculating match score...'}
                         </p>
                       </div>
                     </div>
@@ -281,7 +298,7 @@ export default function ResumeRewriter() {
                   </div>
 
                   <Button
-                    onClick={() => toast.info('Template customization coming soon!')}
+                    onClick={handleUseTemplates}
                     className="w-full btn-primary"
                   >
                     Use Multiple Templates to Create Resume

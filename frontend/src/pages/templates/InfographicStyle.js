@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Navbar } from '../../components/Navbar';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+import { Download } from 'lucide-react';
 
 export default function InfographicStyle() {
   const [name, setName] = useState('MARCUS JOHNSON');
@@ -59,6 +62,19 @@ export default function InfographicStyle() {
   const addExperience = () => setExperiences([...experiences, { period: 'Start - End', title: 'Position', company: 'Company', bullets: ['Achievement 1'] }]);
   const removeExperience = (index) => setExperiences(experiences.filter((_, i) => i !== index));
 
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('resume-preview');
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('resume.pdf');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -66,7 +82,16 @@ export default function InfographicStyle() {
         {/* LEFT: FORM SIDEBAR */}
         <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
           <div className="p-6 space-y-6 text-gray-900">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+            <div className="flex justify-between items-center mb-6 pb-4 border-b">
+              <h2 className="text-2xl font-bold text-gray-900">Edit Your Resume</h2>
+              <button
+                onClick={handleDownloadPDF}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded shadow flex items-center gap-2 text-sm font-medium transition-colors"
+                title="Download as PDF"
+              >
+                <Download className="w-4 h-4" /> Export PDF
+              </button>
+            </div>
 
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-yellow-50 rounded-lg border-2 border-yellow-500">
@@ -137,6 +162,7 @@ export default function InfographicStyle() {
         {/* RIGHT: A4 PREVIEW */}
         <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
           <div
+            id="resume-preview"
             className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl overflow-hidden relative text-white"
             style={{ width: '210mm', minHeight: '297mm' }}
           >

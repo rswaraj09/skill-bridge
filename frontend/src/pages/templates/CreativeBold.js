@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Navbar } from '../../components/Navbar';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+import { Download } from 'lucide-react';
 
 export default function CreativeBold() {
   const [name, setName] = useState('MICHAEL TORRES');
@@ -69,6 +72,19 @@ export default function CreativeBold() {
   const addBullet = (expIndex) => { const newExps = [...experiences]; newExps[expIndex].bullets.push('Achievement'); setExperiences(newExps); };
   const removeBullet = (expIndex, bulletIndex) => { const newExps = [...experiences]; newExps[expIndex].bullets = newExps[expIndex].bullets.filter((_, i) => i !== bulletIndex); setExperiences(newExps); };
 
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('resume-preview');
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('resume.pdf');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -76,7 +92,16 @@ export default function CreativeBold() {
         {/* LEFT: FORM SIDEBAR */}
         <div className="w-[450px] bg-white shadow-xl z-10 overflow-y-auto h-full border-r border-gray-200">
           <div className="p-6 space-y-6 text-gray-900">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Edit Your Resume</h2>
+            <div className="flex justify-between items-center mb-6 pb-4 border-b">
+              <h2 className="text-2xl font-bold text-gray-900">Edit Your Resume</h2>
+              <button
+                onClick={handleDownloadPDF}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow flex items-center gap-2 text-sm font-medium transition-colors"
+                title="Download as PDF"
+              >
+                <Download className="w-4 h-4" /> Export PDF
+              </button>
+            </div>
 
             {/* Photo Upload */}
             <div className="mb-8 p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg border-2 border-pink-400">
@@ -150,6 +175,7 @@ export default function CreativeBold() {
         {/* RIGHT: A4 PREVIEW */}
         <div className="flex-1 bg-slate-900 overflow-y-auto p-8 flex justify-center">
           <div
+            id="resume-preview"
             className="bg-white shadow-2xl overflow-hidden relative"
             style={{ width: '210mm', minHeight: '297mm' }}
           >

@@ -4,10 +4,7 @@
   "private": true,
   "dependencies": {
     "@craco/craco": "^7.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.8.0",
-    "lucide-react": "^0.294.0",
+    "@hookform/resolvers": "^3.3.2",
     "@radix-ui/react-accordion": "^1.0.0",
     "@radix-ui/react-alert-dialog": "^1.0.0",
     "@radix-ui/react-avatar": "^1.0.0",
@@ -34,26 +31,31 @@
     "@radix-ui/react-toggle": "^1.0.0",
     "@radix-ui/react-toggle-group": "^1.0.0",
     "@radix-ui/react-tooltip": "^1.0.0",
+    "axios": "^1.6.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "tailwind-merge": "^2.0.0",
-    "tailwindcss-animate": "^1.0.7",
-    "sonner": "^1.2.4",
-    "react-hook-form": "^7.48.2",
-    "@hookform/resolvers": "^3.3.2",
-    "zod": "^3.22.4",
-    "date-fns": "^3.0.6",
-    "react-day-picker": "^8.10.0",
     "cmdk": "^0.2.0",
-    "input-otp": "^1.2.2",
-    "recharts": "^2.8.0",
-    "react-resizable-panels": "^1.0.7",
-    "vaul": "^0.8.9",
+    "date-fns": "^3.0.6",
     "dotenv": "^16.3.1",
     "embla-carousel-react": "^8.0.0",
-    "next-themes": "^0.2.1",
     "framer-motion": "^10.16.16",
-    "axios": "^1.6.2"
+    "html2canvas": "^1.4.1",
+    "input-otp": "^1.2.2",
+    "jspdf": "^4.0.0",
+    "lucide-react": "^0.294.0",
+    "next-themes": "^0.2.1",
+    "react": "^18.2.0",
+    "react-day-picker": "^8.10.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
+    "react-resizable-panels": "^1.0.7",
+    "react-router-dom": "^6.8.0",
+    "recharts": "^2.8.0",
+    "sonner": "^1.2.4",
+    "tailwind-merge": "^2.0.0",
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^0.8.9",
+    "zod": "^3.22.4"
   },
   "scripts": {
     "start": "craco start",
@@ -70,7 +72,6 @@
   "browserslist": {
     "production": [
       ">0.2%",
-
       "not dead",
       "not op_mini all"
     ],
@@ -81,9 +82,9 @@
     ]
   },
   "devDependencies": {
-    "tailwindcss": "^3.3.0",
+    "@tailwindcss/typography": "^0.5.9",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.21",
-    "@tailwindcss/typography": "^0.5.9"
+    "tailwindcss": "^3.3.0"
   }
 }

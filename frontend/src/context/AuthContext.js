@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           const response = await authService.getMe();
-          setUser(response.data);
+          setUser(response.data.data);
         } catch (error) {
           authService.logout();
         }

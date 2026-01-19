@@ -29,7 +29,7 @@ async function extractTextFromFile(file) {
       // Remove binary characters and keep only readable text
       text = text.replace(/[^\x20-\x7E\n\r\t]/g, ' ');
       text = text.replace(/\s+/g, ' ').trim();
-      
+
       if (!text || text.length < 50) {
         // If extraction failed, return a message asking for a text format
         return 'PDF extracted (Note: For better results, please export your resume as a text file or use a PDF-to-text converter)';
@@ -237,7 +237,7 @@ Please provide a detailed analysis with:
 
     const content = response.data.choices[0].message.content;
     console.log('LLM Response received, length:', content.length);
-    
+
     // Parse the LLM response
     const analysisResult = {
       score: 75,
@@ -265,7 +265,7 @@ Please provide a detailed analysis with:
 
     for (const line of lines) {
       const lowerLine = line.toLowerCase();
-      
+
       if (lowerLine.includes('methodology') || lowerLine.includes('scoring')) {
         currentSection = 'methodology';
       } else if (lowerLine.includes('formatting') || lowerLine.includes('structural')) {
@@ -431,7 +431,7 @@ router.post('/analyze-file', upload.single('file'), async (req, res) => {
 
     // Extract text from file
     const resumeText = await extractTextFromFile(req.file);
-    
+
     if (!resumeText.trim()) {
       return res.status(400).json({
         success: false,
@@ -467,7 +467,7 @@ router.post('/analyze-file', upload.single('file'), async (req, res) => {
 router.post('/analyze', async (req, res) => {
   try {
     const { resume_content } = req.body;
-    
+
     if (!resume_content || !resume_content.trim()) {
       return res.status(400).json({
         success: false,
@@ -500,27 +500,27 @@ router.post('/analyze', async (req, res) => {
 // Calculate ATS score based on resume content
 function calculateATSScore(resumeText, jobDescription = '') {
   let score = 50; // Base score
-  
+
   // Check for proper formatting (no tables, no images, plain text friendly)
   if (!resumeText.includes('|') && !resumeText.includes('├') && !resumeText.includes('─')) {
     score += 5;
   }
-  
+
   // Check for standard sections
   const sections = ['experience', 'education', 'skills', 'summary', 'professional'];
   const sectionCount = sections.filter(s => resumeText.toLowerCase().includes(s)).length;
   score += Math.min(sectionCount * 4, 15);
-  
+
   // Check for quantifiable metrics (numbers, percentages)
   const metricsRegex = /(\d+%|\d+\s*(years?|projects?|clients?|increased?|improved?))/gi;
   const metricsCount = (resumeText.match(metricsRegex) || []).length;
   score += Math.min(metricsCount * 2, 15);
-  
+
   // Check for action verbs
   const actionVerbs = ['led', 'managed', 'developed', 'designed', 'implemented', 'created', 'improved', 'increased', 'achieved', 'directed', 'coordinated', 'established', 'enhanced'];
   const verbCount = actionVerbs.filter(verb => resumeText.toLowerCase().includes(verb)).length;
   score += Math.min(verbCount * 1.5, 12);
-  
+
   // Job keyword matching if job description provided
   if (jobDescription.trim()) {
     const jobKeywords = jobDescription.toLowerCase().split(/\s+/).filter(w => w.length > 4);
@@ -528,14 +528,14 @@ function calculateATSScore(resumeText, jobDescription = '') {
     const keywordMatchPercentage = (matchedKeywords.length / Math.max(jobKeywords.length, 1)) * 100;
     score += Math.min(keywordMatchPercentage / 10, 20);
   }
-  
+
   // Check for common ATS-breaking elements
   if (!resumeText.includes('<') && !resumeText.includes('>')) score += 3;
   if (!resumeText.includes('[') || !resumeText.includes(']')) score += 2;
-  
+
   // Ensure minimum length
   if (resumeText.length > 500) score += 5;
-  
+
   return Math.min(Math.round(score), 100);
 }
 
@@ -630,9 +630,9 @@ REWRITING INSTRUCTIONS - FOLLOW EXACTLY:
 
     const rewrittenContent = response.data.choices[0].message.content.trim();
     const atsScore = calculateATSScore(rewrittenContent, jobDescription);
-    
+
     console.log('Resume rewrite completed. ATS Score:', atsScore);
-    
+
     return { rewrittenContent, atsScore };
   } catch (error) {
     console.error('Error rewriting resume:', error.message);
@@ -644,7 +644,7 @@ REWRITING INSTRUCTIONS - FOLLOW EXACTLY:
 router.post('/rewrite', async (req, res) => {
   try {
     const { resume_content, tone = 'professional', job_description = '' } = req.body;
-    
+
     if (!resume_content || !resume_content.trim()) {
       return res.status(400).json({
         success: false,
@@ -672,7 +672,7 @@ router.post('/rewrite', async (req, res) => {
 router.post('/match-job', async (req, res) => {
   try {
     const { resume_content, job_description } = req.body;
-    
+
     if (!resume_content || !resume_content.trim() || !job_description || !job_description.trim()) {
       return res.status(400).json({
         success: false,
@@ -753,6 +753,105 @@ router.post('/match-job-file', upload.single('file'), async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to perform job matching'
+    });
+  }
+});
+
+// Extract Keywords with LLM
+async function extractKeywordsWithLLM(resumeText) {
+  try {
+    const prompt = `You are a career consultant and job search expert. Analyze the following resume content and extract the most important keywords for a job search.
+    
+    Resume Content:
+    ${resumeText.substring(0, 3000)}
+
+    Please identify:
+    1. The most likely job role/title (e.g., "Frontend Developer", "Data Scientist", "Marketing Manager")
+    2. The top 3-4 distinct technical or hard skills (e.g., "React", "Python", "SEO").
+
+    Format the output as a JSON object with keys: "role" and "skills".
+    Example: {"role": "Full Stack Developer", "skills": ["React", "Node.js", "MongoDB"]}
+    
+    Return ONLY the JSON object. No markdown formatting.`;
+
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'xiaomi/mimo-v2-flash:free',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 500
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'Skill Bridge'
+        }
+      }
+    );
+
+    if (!response.data || !response.data.choices || response.data.choices.length === 0) {
+      throw new Error('Invalid response from LLM API');
+    }
+
+    const content = response.data.choices[0].message.content.trim();
+    console.log('Keyword Extraction LLM Response:', content);
+
+    // Clean up response if it contains markdown code blocks
+    const jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    try {
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      console.error('Failed to parse JSON keyword response:', e);
+      // Fallback
+      return { role: 'Professional', skills: [] };
+    }
+  } catch (error) {
+    console.error('Keyword Extraction API Error:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+// EXTRACT KEYWORDS from resume file
+router.post('/extract-keywords', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No resume file uploaded'
+      });
+    }
+
+    // Extract text from file
+    const resumeText = await extractTextFromFile(req.file);
+
+    if (!resumeText.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Could not extract text from resume file'
+      });
+    }
+
+    // Extract keywords with LLM
+    const keywords = await extractKeywordsWithLLM(resumeText);
+
+    res.status(200).json({
+      success: true,
+      data: keywords
+    });
+  } catch (error) {
+    console.error('Keyword extraction error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to extract keywords'
     });
   }
 });

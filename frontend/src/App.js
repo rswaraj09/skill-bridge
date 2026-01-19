@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import AuthSuccess from './pages/AuthSuccess';
 // Template imports
 import ProfessionalClassic from './pages/templates/ProfessionalClassic';
+import ModernMinimalist from './pages/templates/ModernMinimalist';
 import CreativeBold from './pages/templates/CreativeBold';
 import TechProfessional from './pages/templates/TechProfessional';
 import ExecutiveSummary from './pages/templates/ExecutiveSummary';
@@ -37,6 +38,7 @@ import InfographicStyle from './pages/templates/InfographicStyle';
 import CreativeDesigner from './pages/CreativeDesigner';
 import { useAuth } from './context/AuthContext';
 import { BackgroundLayout } from './components/BackgroundLayout';
+import Chatbot from './components/Chatbot';
 import '@/App.css';
 
 const PrivateRoute = ({ children }) => {
@@ -66,6 +68,7 @@ function AppRoutes() {
       <Route path="/template-editor" element={<PrivateRoute><TemplateEditor /></PrivateRoute>} />
       {/* Individual Template Routes */}
       <Route path="/professional-classic" element={<PrivateRoute><ProfessionalClassic /></PrivateRoute>} />
+      <Route path="/modern-minimalist" element={<PrivateRoute><ModernMinimalist /></PrivateRoute>} />
       <Route path="/creative-bold" element={<PrivateRoute><CreativeBold /></PrivateRoute>} />
       <Route path="/tech-professional" element={<PrivateRoute><TechProfessional /></PrivateRoute>} />
       <Route path="/executive-summary" element={<PrivateRoute><ExecutiveSummary /></PrivateRoute>} />
@@ -99,6 +102,7 @@ function App() {
           <BackgroundLayout>
             <div className="App">
               <AppRoutes />
+              <Chatbot />
               <Toaster position="top-right" />
             </div>
           </BackgroundLayout>
