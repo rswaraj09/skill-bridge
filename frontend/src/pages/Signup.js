@@ -46,7 +46,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-pink-50 dark:bg-transparent transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-pink-100 dark:bg-transparent transition-colors duration-300">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

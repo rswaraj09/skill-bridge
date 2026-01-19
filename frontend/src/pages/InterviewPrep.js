@@ -38,7 +38,7 @@ const InterviewPrep = () => {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-pink-50 dark:bg-transparent transition-colors duration-300">
+        <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-pink-100 dark:bg-transparent transition-colors duration-300">
             <div className="max-w-4xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="text-center space-y-4">
