@@ -8,6 +8,7 @@ import jobRoutes from './routes/jobs.js';
 import applicationRoutes from './routes/applications.js';
 import templateRoutes from './routes/templates.js';
 import chatRoutes from './routes/chat.js';
+import interviewRoutes from './routes/interview.js';
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +41,7 @@ app.use('/api/jobs', protect, jobRoutes); // Protected routes
 app.use('/api/applications', protect, applicationRoutes); // Protected routes
 app.use('/api/templates', protect, templateRoutes); // Protected routes
 app.use('/api/chat', chatRoutes); // Temporary: Public chat route for verification
+app.use('/api/interview', interviewRoutes); // Protected routes
 
 // Basic route
 app.get('/', (req, res) => {

@@ -91,7 +91,7 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-pink-50 dark:bg-transparent transition-colors duration-300">
       <Navbar />
 
       <motion.section

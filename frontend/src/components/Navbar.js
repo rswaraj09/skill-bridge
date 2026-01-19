@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
-import { FileText, BarChart3, RefreshCw, Layout, Briefcase, User, LogOut, Menu } from 'lucide-react';
+import { FileText, BarChart3, RefreshCw, Layout, Briefcase, User, LogOut, Menu, Brain } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -21,6 +21,7 @@ export const Navbar = ({ darkMode = true }) => {
     { to: '/dashboard', label: 'Dashboard', icon: <BarChart3 className="w-4 h-4" /> },
     { to: '/analyze', label: 'Analyze', icon: <FileText className="w-4 h-4" /> },
     { to: '/match', label: 'Job Match', icon: <BarChart3 className="w-4 h-4" /> },
+    { to: '/interview-prep', label: 'Interview Prep', icon: <Brain className="w-4 h-4" /> },
     { to: '/rewrite', label: 'Rewrite', icon: <RefreshCw className="w-4 h-4" /> },
     { to: '/templates', label: 'Templates', icon: <Layout className="w-4 h-4" /> },
     { to: '/jobs', label: 'Jobs', icon: <Briefcase className="w-4 h-4" /> },

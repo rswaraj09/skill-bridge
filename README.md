@@ -7,10 +7,11 @@ Skill Bridge is a modern **MERN + AI** powered platform designed to optimize the
 
 - **AI-Powered Analysis**: Get intelligent feedback on your resume content and formatting.
 - **Smart Resume Builder**: Intuitive interface to create professional, ATS-friendly resumes.
+- **Interview Prep**: Generate domain-specific interview questions and get AI evaluations on your answers.
 - **Skill Gap Analysis**: Identify missing skills required for your target roles.
 - **Secure Authentication**: Robust user management with secure login and registration.
 - **Interactive Dashboard**: Visualize your application progress and resume scores.
-- **Modern UI/UX**: Responsive design with Dark Mode support, built with Tailwind CSS and Radix UI.
+- **Modern UI/UX**: clean Light Pink theme (Light Mode) & Futuristic Dark Mode, built with Tailwind CSS.
 - **File Management**: Seamlessly upload and manage resume documents.
 
 ## 🛠️ Tech Stack

@@ -106,3 +106,8 @@ export const applicationService = {
 export const templateService = {
   getAll: () => api.get('/templates'),
 };
+
+export const interviewService = {
+  generateQuestions: (domain) => api.post('/interview/questions', { domain }),
+  evaluateAnswer: (data) => api.post('/interview/evaluate', data),
+};

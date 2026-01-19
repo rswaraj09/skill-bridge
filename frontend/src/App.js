@@ -39,6 +39,7 @@ import CreativeDesigner from './pages/CreativeDesigner';
 import { useAuth } from './context/AuthContext';
 import { BackgroundLayout } from './components/BackgroundLayout';
 import Chatbot from './components/Chatbot';
+import InterviewPrep from './pages/InterviewPrep';
 import '@/App.css';
 
 const PrivateRoute = ({ children }) => {
@@ -63,6 +64,7 @@ function AppRoutes() {
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/analyze" element={<PrivateRoute><ResumeAnalyzer /></PrivateRoute>} />
       <Route path="/match" element={<PrivateRoute><JobMatch /></PrivateRoute>} />
+      <Route path="/interview-prep" element={<PrivateRoute><InterviewPrep /></PrivateRoute>} />
       <Route path="/rewrite" element={<PrivateRoute><ResumeRewriter /></PrivateRoute>} />
       <Route path="/templates" element={<PrivateRoute><Templates /></PrivateRoute>} />
       <Route path="/template-editor" element={<PrivateRoute><TemplateEditor /></PrivateRoute>} />

@@ -31,7 +31,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden font-sans">
+    <div className="min-h-screen relative overflow-hidden font-sans bg-pink-50 dark:bg-transparent transition-colors duration-300">
       <div className="relative z-10">
         <Navbar darkMode={true} />
       </div>
