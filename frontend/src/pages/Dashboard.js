@@ -15,11 +15,71 @@ export default function Dashboard() {
 
 
   const features = [
-    { icon: <BarChart3 className="w-6 h-6" />, title: 'Analyze Resume', desc: 'Get ATS score', to: '/analyze', color: 'bg-blue-100 text-blue-600', image: '/gif1.gif' },
-    { icon: <TrendingUp className="w-6 h-6" />, title: 'Job Match', desc: 'Match with jobs', to: '/match', color: 'bg-green-100 text-green-600', image: '/gif10.gif' },
-    { icon: <RefreshCw className="w-6 h-6" />, title: 'Rewrite Resume', desc: 'AI-powered', to: '/rewrite', color: 'bg-purple-100 text-purple-600', image: '/gif9.gif' },
-    { icon: <Layout className="w-6 h-6" />, title: 'Templates', desc: '10+ designs', to: '/templates', color: 'bg-orange-100 text-orange-600', image: '/gif8.gif' },
-    { icon: <Briefcase className="w-6 h-6" />, title: 'Browse Jobs', desc: 'Find opportunities', to: '/jobs', color: 'bg-indigo-100 text-indigo-600', image: '/gif7.gif' },
+    {
+      icon: <BarChart3 className="w-6 h-6" />,
+      title: 'Resume Analysis',
+      desc: [
+        'Get instant insights into your resume’s strengths and weaknesses.',
+        'Our AI checks ATS compatibility, keywords, and skill alignment.',
+        'Know exactly what recruiters notice—and what they don’t.',
+        'Optimize your resume before you apply.',
+      ],
+      to: '/analyze',
+      color: 'bg-blue-100 text-blue-600',
+      image: '/gif1.gif',
+    },
+    {
+      icon: <TrendingUp className="w-6 h-6" />,
+      title: 'Job Description Match',
+      desc: [
+        'Check how well your resume matches a job description.',
+        'Get a clear match score with improvement suggestions.',
+        'Identify missing skills and keywords instantly.',
+        'Apply with confidence, backed by data.',
+      ],
+      to: '/match',
+      color: 'bg-green-100 text-green-600',
+      image: '/gif10.gif',
+    },
+    {
+      icon: <RefreshCw className="w-6 h-6" />,
+      title: 'Rewrite Resume',
+      desc: [
+        'Transform your resume into a powerful career story.',
+        'AI-enhanced rewriting highlights impact, achievements, and skills.',
+        'Clear, professional, and recruiter-ready content in seconds.',
+        'Let your resume speak with confidence.',
+      ],
+      to: '/rewrite',
+      color: 'bg-purple-100 text-purple-600',
+      image: '/gif9.gif',
+    },
+    {
+      icon: <Layout className="w-6 h-6" />,
+      title: 'Resume Templates',
+      desc: [
+        'Choose from modern, ATS-friendly resume templates.',
+        'Designed for clarity, readability, and first impressions.',
+        'Customize layouts to match your career goals.',
+        'Professional design made simple.',
+      ],
+      to: '/templates',
+      color: 'bg-orange-100 text-orange-600',
+      image: '/gif8.gif',
+    },
+    {
+      icon: <Briefcase className="w-6 h-6" />,
+      title: 'Browse Jobs',
+      desc: [
+        'Discover jobs that align with your skills and interests.',
+        'Explore opportunities across roles, companies, and industries.',
+        'Smart filters help you find the right fit faster.',
+        'Your next career move starts here.',
+      ],
+      to: '/jobs',
+      color: 'bg-indigo-100 text-indigo-600',
+      image: '/gif7.gif',
+    },
   ];
 
   return (
@@ -61,7 +121,11 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <h3 className="text-2xl font-heading font-bold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
-                        <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">{feature.desc}</p>
+                        <ul className="text-lg text-gray-600 dark:text-gray-400 mb-6 space-y-1 list-disc list-inside">
+                          {feature.desc.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
                         <Link to={feature.to}>
                           <Button className="bg-green-600 hover:bg-green-700 text-white font-medium px-8 py-2 rounded-lg transition-colors">
                             {index % 2 === 0 ? 'Go to ' + feature.title : 'View ' + feature.title}
