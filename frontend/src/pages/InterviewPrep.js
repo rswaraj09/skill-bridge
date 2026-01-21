@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { interviewService } from '../services/api';
 import { Brain, Search, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Navbar } from '../components/Navbar';
 
 const InterviewPrep = () => {
     const [domain, setDomain] = useState('');
@@ -38,99 +39,102 @@ const InterviewPrep = () => {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-pink-100 dark:bg-transparent transition-colors duration-300">
-            <div className="max-w-4xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="text-center space-y-4">
-                    <motion.h1
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400"
-                    >
-                        Interview Preparation
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-gray-600 dark:text-gray-400 text-lg"
-                    >
-                        Master your next interview with AI-curated questions tailored to your domain.
-                    </motion.p>
-                </div>
-
-                {/* Search Box */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="backdrop-blur-xl bg-white/70 dark:bg-white/5 rounded-2xl p-8 border border-white/20 dark:border-white/10 shadow-xl"
-                >
-                    <form onSubmit={handleGenerate} className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                                type="text"
-                                value={domain}
-                                onChange={(e) => setDomain(e.target.value)}
-                                placeholder="Enter your domain (e.g. React Developer, Data Scientist)..."
-                                className="w-full bg-white/50 dark:bg-white/5 border border-white/30 dark:border-white/10 rounded-xl py-4 pl-12 pr-4 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-500 dark:to-pink-500 hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-600 text-white font-bold py-4 px-8 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[160px]"
+        <div className="min-h-screen bg-pink-100 dark:bg-transparent transition-colors duration-300">
+            <Navbar />
+            <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-4xl mx-auto space-y-8">
+                    {/* Header */}
+                    <div className="text-center space-y-4">
+                        <motion.h1
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400"
                         >
-                            {loading ? (
-                                <>
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    Generating...
-                                </>
-                            ) : (
-                                <>
-                                    <Brain className="w-5 h-5" />
-                                    Generate
-                                </>
-                            )}
-                        </button>
-                    </form>
-                </motion.div>
+                            Interview Preparation
+                        </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.1 }}
+                            className="text-gray-600 dark:text-gray-400 text-lg"
+                        >
+                            Master your next interview with AI-curated questions tailored to your domain.
+                        </motion.p>
+                    </div>
 
-                {/* Error Message */}
-                {error && (
+                    {/* Search Box */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4 flex items-center gap-3 text-red-600 dark:text-red-400"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="backdrop-blur-xl bg-white/70 dark:bg-white/5 rounded-2xl p-8 border border-white/20 dark:border-white/10 shadow-xl"
                     >
-                        <AlertCircle className="w-5 h-5" />
-                        <p>{error}</p>
+                        <form onSubmit={handleGenerate} className="flex flex-col md:flex-row gap-4">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                    type="text"
+                                    value={domain}
+                                    onChange={(e) => setDomain(e.target.value)}
+                                    placeholder="Enter your domain (e.g. React Developer, Data Scientist)..."
+                                    className="w-full bg-white/50 dark:bg-white/5 border border-white/30 dark:border-white/10 rounded-xl py-4 pl-12 pr-4 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-500 dark:to-pink-500 hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-600 text-white font-bold py-4 px-8 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[160px]"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Brain className="w-5 h-5" />
+                                        Generate
+                                    </>
+                                )}
+                            </button>
+                        </form>
                     </motion.div>
-                )}
 
-                {/* Questions List */}
-                {questions.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="space-y-6"
-                    >
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Generated Questions</h2>
-                            <span className="bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 px-3 py-1 rounded-full text-sm font-medium border border-purple-200 dark:border-purple-500/20">
-                                {questions.length} Questions
-                            </span>
-                        </div>
+                    {/* Error Message */}
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4 flex items-center gap-3 text-red-600 dark:text-red-400"
+                        >
+                            <AlertCircle className="w-5 h-5" />
+                            <p>{error}</p>
+                        </motion.div>
+                    )}
 
-                        <div className="grid gap-4">
-                            {questions.map((item, index) => (
-                                <QuestionCard key={index} item={item} index={index} />
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
+                    {/* Questions List */}
+                    {questions.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="space-y-6"
+                        >
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Generated Questions</h2>
+                                <span className="bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 px-3 py-1 rounded-full text-sm font-medium border border-purple-200 dark:border-purple-500/20">
+                                    {questions.length} Questions
+                                </span>
+                            </div>
+
+                            <div className="grid gap-4">
+                                {questions.map((item, index) => (
+                                    <QuestionCard key={index} item={item} index={index} />
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </div>
             </div>
         </div>
     );
