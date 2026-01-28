@@ -75,7 +75,7 @@ Format your response clearly with these sections.`;
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'xiaomi/mimo-v2-flash:free',
+        model: 'tngtech/deepseek-r1t2-chimera:free',
         messages: [
           {
             role: 'user',
@@ -211,7 +211,7 @@ Please provide a detailed analysis with:
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'xiaomi/mimo-v2-flash:free',
+        model: 'tngtech/deepseek-r1t2-chimera:free',
         messages: [
           {
             role: 'user',
@@ -604,7 +604,7 @@ REWRITING INSTRUCTIONS - FOLLOW EXACTLY:
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'xiaomi/mimo-v2-flash:free',
+        model: 'tngtech/deepseek-r1t2-chimera:free',
         messages: [
           {
             role: 'user',
@@ -777,7 +777,7 @@ async function extractKeywordsWithLLM(resumeText) {
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'xiaomi/mimo-v2-flash:free',
+        model: 'tngtech/deepseek-r1t2-chimera:free',
         messages: [
           {
             role: 'user',

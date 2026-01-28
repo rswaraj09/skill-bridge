@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_URL } from '../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -121,7 +122,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => {
-                    window.location.href = `http://localhost:5001/api/auth/google`;
+                    window.location.href = `${API_URL}/auth/google`;
                   }}
                   className="w-10 h-10 rounded-full bg-white flex items-center justify-center transition-transform hover:scale-110 shadow-lg"
                 >

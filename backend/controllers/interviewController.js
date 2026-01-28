@@ -31,7 +31,7 @@ export const generateQuestions = async (req, res) => {
         const response = await axios.post(
             'https://openrouter.ai/api/v1/chat/completions',
             {
-                model: 'xiaomi/mimo-v2-flash:free',
+                model: 'tngtech/deepseek-r1t2-chimera:free',
                 messages: messages,
                 temperature: 0.7,
                 max_tokens: 4000
@@ -120,7 +120,7 @@ export const evaluateAnswer = async (req, res) => {
         const response = await axios.post(
             'https://openrouter.ai/api/v1/chat/completions',
             {
-                model: 'xiaomi/mimo-v2-flash:free',
+                model: 'tngtech/deepseek-r1t2-chimera:free',
                 messages: messages,
                 temperature: 0.3,
                 max_tokens: 1000
