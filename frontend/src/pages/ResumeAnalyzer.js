@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
@@ -16,6 +16,44 @@ export default function ResumeAnalyzer() {
   const [fileName, setFileName] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [userResume, setUserResume] = useState(null);
+
+  useEffect(() => {
+    fetchSavedResume();
+  }, []);
+
+  const fetchSavedResume = async () => {
+    try {
+      const response = await resumeService.getMyResume();
+      if (response.data.success) {
+        setUserResume(response.data.data);
+      }
+    } catch (error) {
+      console.log('No saved resume found');
+    }
+  };
+
+  const handleUseSavedResume = () => {
+    if (userResume) {
+      // Create a blob-like object or just use text analysis
+      // Since analyzeFile expects a file, we should switch to analyze text endpoint if using saved resume
+      handleAnalyzeText(userResume.content);
+    }
+  };
+
+  const handleAnalyzeText = async (text) => {
+    setLoading(true);
+    try {
+      const response = await resumeService.analyze(text);
+      const analysisData = response.data.data || response.data;
+      setResult(analysisData);
+      toast.success('Analysis complete using saved resume!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Analysis failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -82,6 +120,24 @@ export default function ResumeAnalyzer() {
               <div className="space-y-6">
                 <div>
                   <Label htmlFor="resume">Upload Your Resume</Label>
+
+                  {userResume && (
+                    <div className="mb-4 mt-2 p-4 border border-blue-200 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-blue-900 dark:text-blue-100">Saved Resume found</p>
+                        <p className="text-sm text-blue-700 dark:text-blue-300">{userResume.title}</p>
+                      </div>
+                      <Button
+                        onClick={handleUseSavedResume}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        size="sm"
+                        disabled={loading}
+                      >
+                        Use Saved Resume
+                      </Button>
+                    </div>
+                  )}
+
                   <div className="mt-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
                     <input
                       id="resume"
@@ -147,7 +203,7 @@ export default function ResumeAnalyzer() {
                     </div>
                     <p className="text-muted-foreground mb-4">ATS Compatibility Score</p>
                     <Progress value={result.score && !isNaN(result.score) ? result.score : 0} className="h-2" />
-                    <Button 
+                    <Button
                       onClick={() => navigate('/job-match')}
                       className="mt-6 bg-primary hover:bg-primary/90"
                     >

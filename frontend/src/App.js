@@ -13,6 +13,7 @@ import ResumeRewriter from './pages/ResumeRewriter';
 import Templates from './pages/Templates';
 import TemplateEditor from './pages/TemplateEditor';
 import JobsBoard from './pages/JobsBoard';
+import History from './pages/History';
 import Applications from './pages/Applications';
 import Profile from './pages/Profile';
 import AuthSuccess from './pages/AuthSuccess';
@@ -58,6 +59,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
       <Route path="/auth-success" element={<AuthSuccess />} />

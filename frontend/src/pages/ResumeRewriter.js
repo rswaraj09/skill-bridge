@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 
 import { motion } from 'framer-motion';
@@ -24,32 +24,46 @@ export default function ResumeRewriter() {
   const [loading, setLoading] = useState(false);
   const [atsScore, setATSScore] = useState(null);
   const [jobMatch, setJobMatch] = useState(null);
+  const [userResume, setUserResume] = useState(null);
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  useEffect(() => {
+    fetchSavedResume();
+  }, []);
 
+  const fetchSavedResume = async () => {
+    try {
+      const response = await resumeService.getMyResume();
+      if (response.data.success) {
+        setUserResume(response.data.data);
+      }
+    } catch (error) {
+      console.log('No saved resume found');
+    }
+  };
+
+  const processResumeText = async (text, file = null) => {
     if (!jobDescription.trim()) {
       toast.error('Please provide a job description first');
       return;
     }
 
-    setResumeFile(file);
     setLoading(true);
+    setResumeContent(text);
 
     try {
-      // Extract text from file
-      const text = await file.text();
-      setResumeContent(text);
-
+      let matchResponse;
       // Analyze and rewrite resume with job description
-      const response = await resumeService.matchJobFile(file, jobDescription);
+      if (file) {
+        matchResponse = await resumeService.matchJobFile(file, jobDescription);
+      } else {
+        matchResponse = await resumeService.matchJob(text, jobDescription);
+      }
 
-      setAnalysisReport(response.data);
+      setAnalysisReport(matchResponse.data);
 
       // Extract job match percentage if available
-      if (response.data.data && response.data.data.match_percentage) {
-        setJobMatch(response.data.data.match_percentage);
+      if (matchResponse.data.data && matchResponse.data.data.match_percentage) {
+        setJobMatch(matchResponse.data.data.match_percentage);
       }
 
       // Generate rewritten resume with the job description alignment
@@ -61,11 +75,25 @@ export default function ResumeRewriter() {
       toast.success(`${scoreEmoji} Resume rewritten! ATS Score: ${rewriteResponse.data.ats_score}%`);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to process resume');
-      setResumeFile(null);
       setResumeContent('');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUseSavedResume = () => {
+    if (userResume) {
+      processResumeText(userResume.content);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setResumeFile(file);
+    const text = await file.text();
+    processResumeText(text, file);
   };
 
   const handleCopy = () => {
@@ -141,6 +169,33 @@ export default function ResumeRewriter() {
                   <Label htmlFor="resume-upload" className="block mb-2">
                     Upload Your Resume
                   </Label>
+
+                  {userResume && (
+                    <div className="mb-4">
+                      <div className="p-4 border rounded-lg bg-muted/50 flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-sm">Saved Resume: {userResume.title}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(userResume.updatedAt).toLocaleDateString()}</p>
+                        </div>
+                        <Button
+                          onClick={handleUseSavedResume}
+                          disabled={loading || !jobDescription.trim()}
+                          size="sm"
+                          className="h-8"
+                        >
+                          Use This
+                        </Button>
+                      </div>
+                      <div className="relative my-4">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-muted-foreground">Or upload new</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className="relative">
                     <input
                       id="resume-upload"

@@ -11,7 +11,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { jobService, applicationService, resumeService } from '../services/api';
 import { toast } from 'sonner';
-import { Briefcase, MapPin, Clock, IndianRupee, Loader2, Send, Upload, Search, ExternalLink } from 'lucide-react';
+import { Briefcase, MapPin, Clock, IndianRupee, Loader2, Send, Upload, Search, ExternalLink, ScanText } from 'lucide-react';
 
 export default function JobsBoard() {
   /* Jobs Logic Removed as per requirement
@@ -38,9 +38,25 @@ export default function JobsBoard() {
 
   const [scanning, setScanning] = useState(false);
   const [keywordResults, setKeywordResults] = useState(null);
+  const [userResume, setUserResume] = useState(null);
+
+  useEffect(() => {
+    fetchSavedResume();
+  }, []);
+
+  const fetchSavedResume = async () => {
+    try {
+      const response = await resumeService.getMyResume();
+      if (response.data.success) {
+        setUserResume(response.data.data);
+      }
+    } catch (error) {
+      console.log('No saved resume found');
+    }
+  };
 
   const handleScanResume = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
     setScanning(true);
@@ -51,6 +67,23 @@ export default function JobsBoard() {
       toast.success('Resume analyzed for job keywords!');
     } catch (error) {
       toast.error('Failed to scan resume');
+      console.error(error);
+    } finally {
+      setScanning(false);
+    }
+  };
+
+  const handleUseSavedResume = async () => {
+    if (!userResume) return;
+
+    setScanning(true);
+    setKeywordResults(null);
+    try {
+      const response = await resumeService.extractKeywordsText(userResume.content);
+      setKeywordResults(response.data.data);
+      toast.success('Saved resume analyzed for job keywords!');
+    } catch (error) {
+      toast.error('Failed to scan saved resume');
       console.error(error);
     } finally {
       setScanning(false);
@@ -86,6 +119,33 @@ export default function JobsBoard() {
                 <p className="text-muted-foreground mb-4">
                   Upload your resume to automatically find relevant opportunities across major job platforms.
                 </p>
+                {userResume && (
+                  <div className="mb-4 p-3 bg-background/50 rounded-lg border border-border">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="font-medium text-sm">Saved Resume: {userResume.title}</p>
+                        <p className="text-xs text-muted-foreground">Last updated: {new Date(userResume.updatedAt).toLocaleDateString()}</p>
+                      </div>
+                      <Button
+                        onClick={handleUseSavedResume}
+                        disabled={scanning}
+                        size="sm"
+                        variant="secondary"
+                      >
+                        {scanning ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <ScanText className="w-3 h-3 mr-2" />}
+                        Scan This Resume
+                      </Button>
+                    </div>
+                    <div className="relative my-3">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">Or upload new</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center gap-4">
                   <label className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium flex items-center gap-2 transition-colors">
                     {scanning ? (

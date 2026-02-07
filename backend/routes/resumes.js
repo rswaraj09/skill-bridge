@@ -1,5 +1,6 @@
 import express from 'express';
 import Resume from '../models/Resume.js';
+import History from '../models/History.js';
 import multer from 'multer';
 import axios from 'axios';
 
@@ -56,10 +57,10 @@ async function matchWithLLM(resumeText, jobDescription) {
     const prompt = `You are an expert resume and job matching analyst. Please analyze how well the provided resume matches the job description.
 
 Resume Content:
-${resumeText}
+${resumeText.substring(0, 4000)}
 
 Job Description:
-${jobDescription}
+${jobDescription.substring(0, 2000)}
 
 Please provide a detailed job match analysis with:
 - match_percentage: a number from 0-100 indicating the match percentage
@@ -75,7 +76,7 @@ Format your response clearly with these sections.`;
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'tngtech/deepseek-r1t2-chimera:free',
+        model: 'google/gemini-2.0-flash-001',
         messages: [
           {
             role: 'user',
@@ -83,7 +84,7 @@ Format your response clearly with these sections.`;
           }
         ],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: 1000
       },
       {
         headers: {
@@ -91,7 +92,8 @@ Format your response clearly with these sections.`;
           'Content-Type': 'application/json',
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'Skill Bridge'
-        }
+        },
+        timeout: 60000 // 60s timeout
       }
     );
 
@@ -118,9 +120,6 @@ Format your response clearly with these sections.`;
     if (percentageMatch) {
       const parsedPercentage = parseInt(percentageMatch[1]);
       matchResult.match_percentage = Math.min(100, Math.max(0, parsedPercentage));
-      console.log('Extracted match percentage:', matchResult.match_percentage);
-    } else {
-      matchResult.match_percentage = 75;
     }
 
     // Split content into sections and parse
@@ -172,16 +171,17 @@ Format your response clearly with these sections.`;
 
     return matchResult;
   } catch (error) {
-    console.error('Job Match LLM API Error:', error.response?.data || error.message);
+    console.error('Job Match LLM API Error:', error.message);
     // Return a default response if LLM fails
+    const localScore = calculateATSScore(resumeText, jobDescription);
     return {
-      match_percentage: 75,
-      key_requirements: ['Experience required'],
-      addressed_requirements: ['Resume shows relevant experience'],
+      match_percentage: localScore,
+      key_requirements: ['Requirements analysis unavailable'],
+      addressed_requirements: ['Unable to verify addressed requirements'],
       missing_keywords: [],
-      skills_to_emphasize: ['Technical skills'],
-      gaps: ['Limited information for full analysis'],
-      recommendations: ['Please try again', 'Ensure both resume and job description are provided']
+      skills_to_emphasize: ['Communication', 'Problem Solving', 'Teamwork'],
+      gaps: ['Detailed gap analysis unavailable'],
+      recommendations: ['Detailed analysis service is currently busy, please try again later.']
     };
   }
 }
@@ -198,7 +198,7 @@ async function analyzeWithLLM(resumeText) {
    - Check for proper use of keywords, standard section headings, and machine-readable format
 
 Resume Content:
-${resumeText}
+${resumeText.substring(0, 5000)}
 
 Please provide a detailed analysis with:
 - score: a number from 0-100
@@ -211,7 +211,7 @@ Please provide a detailed analysis with:
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'tngtech/deepseek-r1t2-chimera:free',
+        model: 'google/gemini-2.0-flash-001',
         messages: [
           {
             role: 'user',
@@ -219,7 +219,7 @@ Please provide a detailed analysis with:
           }
         ],
         temperature: 0.7,
-        max_tokens: 1500
+        max_tokens: 1000
       },
       {
         headers: {
@@ -227,7 +227,8 @@ Please provide a detailed analysis with:
           'Content-Type': 'application/json',
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'Skill Bridge'
-        }
+        },
+        timeout: 60000 // 60 second timeout
       }
     );
 
@@ -253,10 +254,6 @@ Please provide a detailed analysis with:
     if (scoreMatch) {
       const parsedScore = parseInt(scoreMatch[1]);
       analysisResult.score = Math.min(100, Math.max(0, parsedScore));
-      console.log('Extracted score:', analysisResult.score);
-    } else {
-      console.log('Could not extract score from response, using default');
-      analysisResult.score = 75;
     }
 
     // Split content into sections and parse
@@ -304,18 +301,104 @@ Please provide a detailed analysis with:
 
     return analysisResult;
   } catch (error) {
-    console.error('LLM API Error:', error.response?.data || error.message);
-    // Return a default response if LLM fails
+    console.error('LLM API Error:', error.message);
+    // Return structured fallback response instead of throwing
     return {
-      score: 75,
-      methodology: 'ATS score calculated based on standard resume evaluation criteria.',
-      formatting_issues: [],
-      strengths: ['Resume has basic structure'],
-      weaknesses: ['Unable to perform detailed analysis at this moment'],
-      suggestions: ['Please try again', 'Ensure resume is in a valid format']
+      score: calculateATSScore(resumeText), // Use local calculation as fallback
+      methodology: 'ATS score calculated using local heuristic analysis due to LLM service unavailability.',
+      formatting_issues: ['Automatic analysis unavailable'],
+      strengths: ['Resume content extracted successfully'],
+      weaknesses: ['Detailed AI analysis unavailable - please try again later'],
+      suggestions: ['Ensure standard sections are present', 'Check for spelling and grammar errors']
     };
   }
 }
+
+// GET current user's resume
+router.get('/me', async (req, res) => {
+  try {
+    const resume = await Resume.findOne({ user_id: req.userId }).sort({ updatedAt: -1 });
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: 'No resume found for this user'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: resume
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// UPLOAD/UPDATE user resume
+router.post('/upload', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    // Extract text
+    const resumeText = await extractTextFromFile(req.file);
+    if (!resumeText.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Could not extract text from file'
+      });
+    }
+
+    // Check if user already has a resume
+    let resume = await Resume.findOne({ user_id: req.userId });
+
+    if (resume) {
+      // Update existing
+      resume.title = req.file.originalname;
+      resume.content = resumeText;
+      resume.updatedAt = Date.now();
+      await resume.save();
+    } else {
+      // Create new
+      resume = await Resume.create({
+        user_id: req.userId,
+        title: req.file.originalname,
+        content: resumeText
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Resume uploaded successfully',
+      data: resume
+    });
+
+    // Log history
+    try {
+      await History.create({
+        user_id: req.userId,
+        action_type: 'RESUME_UPLOAD',
+        title: `Uploaded: ${req.file.originalname}`,
+        details: { filename: req.file.originalname }
+      });
+    } catch (err) {
+      console.error('Failed to log history:', err);
+    }
+
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
 
 // GET all resumes for user
 router.get('/', async (req, res) => {
@@ -454,6 +537,21 @@ router.post('/analyze-file', upload.single('file'), async (req, res) => {
         suggestions: analysis.suggestions
       }
     });
+
+    // Log history
+    try {
+      await History.create({
+        user_id: req.userId,
+        action_type: 'ATS_ANALYSIS',
+        title: `Analyzed Resume: ${req.file.originalname}`,
+        details: {
+          filename: req.file.originalname,
+          score: analysis.score
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log history:', err);
+    }
   } catch (error) {
     console.error('Analysis error:', error);
     res.status(500).json({
@@ -489,6 +587,20 @@ router.post('/analyze', async (req, res) => {
         suggestions: analysis.suggestions
       }
     });
+
+    // Log history
+    try {
+      await History.create({
+        user_id: req.userId,
+        action_type: 'ATS_ANALYSIS',
+        title: `Analyzed Resume (Text)`,
+        details: {
+          score: analysis.score
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log history:', err);
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -554,13 +666,13 @@ async function rewriteResumeWithLLM(resumeContent, jobDescription, tone = 'profe
 CRITICAL: Rewrite this resume to achieve an ATS score of 95%+ and perfect job alignment.
 
 JOB DESCRIPTION:
-${jobDescription || 'Optimize for general roles'}
+${(jobDescription || 'Optimize for general roles').substring(0, 2000)}
 
 KEY REQUIREMENTS TO INCORPORATE:
 ${jobKeywords.slice(0, 10).join(', ')}
 
 ORIGINAL RESUME:
-${resumeContent}
+${resumeContent.substring(0, 4000)}
 
 REWRITING INSTRUCTIONS - FOLLOW EXACTLY:
 
@@ -604,15 +716,15 @@ REWRITING INSTRUCTIONS - FOLLOW EXACTLY:
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'tngtech/deepseek-r1t2-chimera:free',
+        model: 'google/gemini-2.0-flash-001',
         messages: [
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.6, // Lower temp for consistency
-        max_tokens: 3000
+        temperature: 0.7,
+        max_tokens: 2500
       },
       {
         headers: {
@@ -620,7 +732,8 @@ REWRITING INSTRUCTIONS - FOLLOW EXACTLY:
           'Content-Type': 'application/json',
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'Skill Bridge'
-        }
+        },
+        timeout: 90000 // 90s timeout for rewriting
       }
     );
 
@@ -636,7 +749,11 @@ REWRITING INSTRUCTIONS - FOLLOW EXACTLY:
     return { rewrittenContent, atsScore };
   } catch (error) {
     console.error('Error rewriting resume:', error.message);
-    throw error;
+    // Return original content with a note if rewrite fails, instead of error
+    return {
+      rewrittenContent: `[AI Optimization Failed - Returning Original Content]\n\n${resumeContent}`,
+      atsScore: calculateATSScore(resumeContent, jobDescription)
+    };
   }
 }
 
@@ -660,6 +777,21 @@ router.post('/rewrite', async (req, res) => {
       rewritten_content: result.rewrittenContent,
       ats_score: result.atsScore
     });
+
+    // Log history
+    try {
+      await History.create({
+        user_id: req.userId,
+        action_type: 'RESUME_REWRITE',
+        title: `Rewrote Resume (${tone})`,
+        details: {
+          tone: tone,
+          ats_score: result.atsScore
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log history:', err);
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -695,6 +827,21 @@ router.post('/match-job', async (req, res) => {
         recommendations: analysis.recommendations
       }
     });
+
+    // Log history
+    try {
+      await History.create({
+        user_id: req.userId,
+        action_type: 'JOB_MATCH',
+        title: `Matched Resume with Job`,
+        details: {
+          match_percentage: analysis.match_percentage,
+          job_preview: job_description.substring(0, 50) + '...'
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log history:', err);
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -748,6 +895,22 @@ router.post('/match-job-file', upload.single('file'), async (req, res) => {
         recommendations: analysis.recommendations
       }
     });
+
+    // Log history
+    try {
+      await History.create({
+        user_id: req.userId,
+        action_type: 'JOB_MATCH',
+        title: `Matched Resume with Job (File)`,
+        details: {
+          match_percentage: analysis.match_percentage,
+          job_preview: job_description.substring(0, 50) + '...',
+          filename: req.file.originalname
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log history:', err);
+    }
   } catch (error) {
     console.error('Job match error:', error);
     res.status(500).json({
@@ -777,7 +940,7 @@ async function extractKeywordsWithLLM(resumeText) {
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'tngtech/deepseek-r1t2-chimera:free',
+        model: 'google/gemini-2.0-flash-001',
         messages: [
           {
             role: 'user',
@@ -793,7 +956,8 @@ async function extractKeywordsWithLLM(resumeText) {
           'Content-Type': 'application/json',
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'Skill Bridge'
-        }
+        },
+        timeout: 30000 // 30s timeout
       }
     );
 
@@ -805,18 +969,29 @@ async function extractKeywordsWithLLM(resumeText) {
     console.log('Keyword Extraction LLM Response:', content);
 
     // Clean up response if it contains markdown code blocks
-    const jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
+    let jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
+    // Sometimes simple content comes with single backticks
+    jsonStr = jsonStr.replace(/^`+|`+$/g, '');
 
     try {
       return JSON.parse(jsonStr);
     } catch (e) {
       console.error('Failed to parse JSON keyword response:', e);
-      // Fallback
-      return { role: 'Professional', skills: [] };
+      // Attempt to extract from text if JSON parsing fails
+      const roleMatch = content.match(/role["']?\s*:\s*["']([^"']+)["']/i);
+      const skillsMatch = content.match(/skills["']?\s*:\s*\[(.*?)\]/is);
+
+      const role = roleMatch ? roleMatch[1] : 'Job Seeker';
+      const skills = skillsMatch
+        ? skillsMatch[1].split(',').map(s => s.trim().replace(/['"]/g, ''))
+        : ['General Skills'];
+
+      return { role, skills };
     }
   } catch (error) {
-    console.error('Keyword Extraction API Error:', error.response?.data || error.message);
-    throw error;
+    console.error('Keyword Extraction API Error:', error.message);
+    // Fallback
+    return { role: 'Job Seeker', skills: ['Update Resume'] };
   }
 }
 
@@ -847,6 +1022,65 @@ router.post('/extract-keywords', upload.single('file'), async (req, res) => {
       success: true,
       data: keywords
     });
+
+    // Log history
+    try {
+      await History.create({
+        user_id: req.userId,
+        action_type: 'KEYWORD_EXTRACTION',
+        title: `Extracted Keywords from File`,
+        details: {
+          filename: req.file.originalname,
+          role: keywords.role,
+          skill_count: keywords.skills.length
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log history:', err);
+    }
+  } catch (error) {
+    console.error('Keyword extraction error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to extract keywords'
+    });
+  }
+});
+
+// EXTRACT KEYWORDS from text (saved resume)
+router.post('/extract-keywords-text', async (req, res) => {
+  try {
+    const { resume_content } = req.body;
+
+    if (!resume_content || !resume_content.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Resume content is required'
+      });
+    }
+
+    // Extract keywords with LLM
+    const keywords = await extractKeywordsWithLLM(resume_content);
+
+    res.status(200).json({
+      success: true,
+      data: keywords
+    });
+
+    // Log history
+    try {
+      await History.create({
+        user_id: req.userId,
+        action_type: 'KEYWORD_EXTRACTION',
+        title: `Extracted Keywords from Text`,
+        details: {
+          role: keywords.role,
+          skill_count: keywords.skills.length
+        }
+      });
+    } catch (err) {
+      console.error('Failed to log history:', err);
+    }
   } catch (error) {
     console.error('Keyword extraction error:', error);
     res.status(500).json({

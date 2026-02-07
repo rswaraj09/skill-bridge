@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
-import { FileText, BarChart3, RefreshCw, Layout, Briefcase, User, LogOut, Menu, Brain } from 'lucide-react';
+import { FileText, BarChart3, RefreshCw, Layout, Briefcase, User, LogOut, Menu, Brain, Clock } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -19,12 +19,14 @@ export const Navbar = ({ darkMode = true }) => {
 
   const navLinks = isAuthenticated ? [
     { to: '/dashboard', label: 'Dashboard', icon: <BarChart3 className="w-4 h-4" /> },
-    { to: '/analyze', label: 'Analyze', icon: <FileText className="w-4 h-4" /> },
-    { to: '/match', label: 'Job Match', icon: <BarChart3 className="w-4 h-4" /> },
+    { to: '/analyze', label: 'ATS Scan', icon: <FileText className="w-4 h-4" /> },
+    { to: '/match', label: 'Resume Analyser', icon: <BarChart3 className="w-4 h-4" /> },
     { to: '/interview-prep', label: 'Interview Prep', icon: <Brain className="w-4 h-4" /> },
     { to: '/rewrite', label: 'Rewrite', icon: <RefreshCw className="w-4 h-4" /> },
     { to: '/templates', label: 'Templates', icon: <Layout className="w-4 h-4" /> },
+    { to: '/templates', label: 'Templates', icon: <Layout className="w-4 h-4" /> },
     { to: '/jobs', label: 'Jobs', icon: <Briefcase className="w-4 h-4" /> },
+    { to: '/history', label: 'History', icon: <Clock className="w-4 h-4" /> },
   ] : [];
 
   const navClass = 'dark:bg-black/20 bg-white/70 border-b dark:border-white/10 border-gray-200 sticky top-0 z-50 backdrop-blur-md transition-all duration-300';
@@ -69,16 +71,6 @@ export const Navbar = ({ darkMode = true }) => {
                     <span>{user?.full_name?.split(' ')[0] || 'Profile'}</span>
                   </Button>
                 </Link>
-                <Button
-                  onClick={handleLogout}
-                  variant="outline"
-                  size="sm"
-                  className="font-body border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 bg-transparent"
-                  data-testid="logout-button"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </Button>
               </>
             ) : (
               <>
@@ -143,6 +135,6 @@ export const Navbar = ({ darkMode = true }) => {
           </Sheet>
         </div>
       </div>
-    </nav>
+    </nav >
   );
 };

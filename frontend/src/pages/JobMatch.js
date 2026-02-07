@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
@@ -16,6 +16,34 @@ export default function JobMatch() {
   const [jobDescription, setJobDescription] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [userResume, setUserResume] = useState(null);
+  const [useSavedResume, setUseSavedResume] = useState(false);
+
+  useEffect(() => {
+    fetchSavedResume();
+  }, []);
+
+  const fetchSavedResume = async () => {
+    try {
+      const response = await resumeService.getMyResume();
+      if (response.data.success) {
+        setUserResume(response.data.data);
+      }
+    } catch (error) {
+      console.log('No saved resume found');
+    }
+  };
+
+  const handleUseSavedResume = () => {
+    setUseSavedResume(true);
+    setResumeFile(null);
+    setResumeFileName('');
+    toast.success('Using saved resume: ' + userResume.title);
+  };
+
+  const handleUseUpload = () => {
+    setUseSavedResume(false);
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -33,13 +61,20 @@ export default function JobMatch() {
   };
 
   const handleMatch = async () => {
-    if (!resumeFile || !jobDescription.trim()) {
-      toast.error('Please upload resume and provide job description');
+    if ((!resumeFile && !useSavedResume) || !jobDescription.trim()) {
+      toast.error('Please upload resume (or use saved one) and provide job description');
       return;
     }
+
     setLoading(true);
     try {
-      const response = await resumeService.matchJobFile(resumeFile, jobDescription);
+      let response;
+      if (useSavedResume && userResume) {
+        response = await resumeService.matchJob(userResume.content, jobDescription);
+      } else {
+        response = await resumeService.matchJobFile(resumeFile, jobDescription);
+      }
+
       const matchData = response.data.data || response.data;
       setResult(matchData);
       toast.success('Match analysis complete!');
@@ -68,17 +103,40 @@ export default function JobMatch() {
         >
           <div className="mb-8">
             <h1 className="text-4xl font-heading font-bold text-foreground mb-3">
-              Job Description Match
+              Resume Analyser
             </h1>
             <p className="text-lg text-muted-foreground">
-              See how well your resume matches a specific job
+              Analyze your resume against a specific job description
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
             <Card className="p-6" data-testid="resume-input-card">
               <Label htmlFor="resume">Your Resume</Label>
-              <div className="mt-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
+
+              {userResume && (
+                <div className="mb-4 mt-2">
+                  <div className={`p-4 border rounded-lg flex items-center justify-between transition-colors ${useSavedResume ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
+                    <div>
+                      <p className="font-semibold text-foreground">Saved Resume</p>
+                      <p className="text-sm text-muted-foreground">{userResume.title}</p>
+                    </div>
+                    <Button
+                      onClick={handleUseSavedResume}
+                      variant={useSavedResume ? "default" : "outline"}
+                      size="sm"
+                    >
+                      {useSavedResume ? 'Selected' : 'Use This'}
+                    </Button>
+                  </div>
+                  {useSavedResume && <p className="text-xs text-muted-foreground mt-2 text-center">- OR -</p>}
+                </div>
+              )}
+
+              <div
+                className={`mt-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-8 text-center hover:border-primary/50 transition-colors ${useSavedResume ? 'opacity-50 pointer-events-none' : ''}`}
+                onClick={useSavedResume ? handleUseUpload : undefined}
+              >
                 <input
                   id="resume"
                   type="file"

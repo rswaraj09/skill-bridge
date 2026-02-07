@@ -48,9 +48,7 @@ export const authService = {
 
 export const resumeService = {
   analyze: (content) => {
-    const formData = new FormData();
-    formData.append('resume_content', content);
-    return api.post('/resumes/analyze', formData);
+    return api.post('/resumes/analyze', { resume_content: content });
   },
   analyzeFile: (file) => {
     const formData = new FormData();
@@ -62,10 +60,10 @@ export const resumeService = {
     });
   },
   matchJob: (resumeContent, jobDescription) => {
-    const formData = new FormData();
-    formData.append('resume_content', resumeContent);
-    formData.append('job_description', jobDescription);
-    return api.post('/resumes/match-job', formData);
+    return api.post('/resumes/match-job', {
+      resume_content: resumeContent,
+      job_description: jobDescription
+    });
   },
   matchJobFile: (file, jobDescription) => {
     const formData = new FormData();
@@ -92,6 +90,19 @@ export const resumeService = {
       }
     });
   },
+  extractKeywordsText: (content) => {
+    return api.post('/resumes/extract-keywords-text', { resume_content: content });
+  },
+  getMyResume: () => api.get('/resumes/me'),
+  upload: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/resumes/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
 };
 
 export const jobService = {
@@ -102,6 +113,11 @@ export const jobService = {
 export const applicationService = {
   create: (data) => api.post('/applications', data),
   getAll: () => api.get('/applications'),
+};
+
+// History Service
+export const historyService = {
+  getAll: () => api.get('/history'),
 };
 
 export const templateService = {

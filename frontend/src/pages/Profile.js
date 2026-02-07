@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
@@ -6,11 +7,17 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Calendar } from 'lucide-react';
+import { User, Mail, Calendar, LogOut } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,7 +55,7 @@ export default function Profile() {
                   id="name"
                   value={user?.full_name || ''}
                   readOnly
-                  className="mt-2 bg-stone-50"
+                  className="mt-2"
                   data-testid="name-input"
                 />
               </div>
@@ -58,7 +65,7 @@ export default function Profile() {
                   id="email"
                   value={user?.email || ''}
                   readOnly
-                  className="mt-2 bg-stone-50"
+                  className="mt-2"
                   data-testid="email-input"
                 />
               </div>
@@ -75,12 +82,21 @@ export default function Profile() {
               <h3 className="font-heading font-semibold text-foreground mb-4">Account Actions</h3>
               <div className="flex space-x-3">
                 <Button variant="outline" data-testid="change-password-button">Change Password</Button>
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                  data-testid="logout-button"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
                 <Button variant="outline" data-testid="delete-account-button" className="text-destructive hover:text-destructive">Delete Account</Button>
               </div>
             </div>
           </Card>
         </motion.div>
       </div>
-    </div>
+    </div >
   );
 }

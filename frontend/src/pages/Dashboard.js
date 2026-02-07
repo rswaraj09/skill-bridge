@@ -1,23 +1,72 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../context/AuthContext';
+import { resumeService } from '../services/api';
 
-import { BarChart3, RefreshCw, Layout, Briefcase, FolderOpen, TrendingUp } from 'lucide-react';
+import { BarChart3, RefreshCw, Layout, Briefcase, FolderOpen, TrendingUp, FileText, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [resume, setResume] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    fetchResume();
+  }, []);
+
+  const fetchResume = async () => {
+    try {
+      const response = await resumeService.getMyResume();
+      if (response.data.success) {
+        setResume(response.data.data);
+      }
+    } catch (error) {
+      console.log('No resume found or error fetching resume');
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate type
+    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a PDF, DOCX, or TXT file');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const response = await resumeService.upload(file);
+      if (response.data.success) {
+        setResume(response.data.data);
+        toast.success('Resume uploaded successfully!');
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+      toast.error(error.response?.data?.message || 'Failed to upload resume');
+    } finally {
+      setIsUploading(false);
+      // Reset input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
 
 
   const features = [
     {
       icon: <BarChart3 className="w-6 h-6" />,
-      title: 'Resume Analysis',
+      title: 'ATS Analysis',
       desc: [
         'Get instant insights into your resume’s strengths and weaknesses.',
         'Our AI checks ATS compatibility, keywords, and skill alignment.',
@@ -30,7 +79,7 @@ export default function Dashboard() {
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
-      title: 'Job Description Match',
+      title: 'Resume Analyser',
       desc: [
         'Check how well your resume matches a job description.',
         'Get a clear match score with improvement suggestions.',
@@ -98,6 +147,66 @@ export default function Dashboard() {
           <p className="text-lg text-gray-600 dark:text-gray-400">
             Let's continue building your career success
           </p>
+        </motion.div>
+
+        {/* Resume Upload Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="mb-12"
+        >
+          <Card className="bg-white dark:bg-white/5 p-8 border border-gray-200 dark:border-white/10 shadow-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center">
+                  <FileText className="w-8 h-8" />
+                </div>
+                <div className="text-center md:text-left">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">My Resume</h2>
+                  {resume ? (
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium mb-1 text-lg">{resume.title}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Last updated: {new Date(resume.updatedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Upload your resume once and use it across all features instantly.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".pdf,.docx,.txt"
+                  onChange={handleFileUpload}
+                />
+                <Button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg transition-all transform hover:scale-105"
+                >
+                  {isUploading ? (
+                    <span className="flex items-center">
+                      <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                      Uploading...
+                    </span>
+                  ) : (
+                    <span className="flex items-center">
+                      <Upload className="w-5 h-5 mr-2" />
+                      {resume ? 'Update Resume' : 'Upload Resume'}
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
 
