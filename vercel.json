@@ -39,6 +39,9 @@
       "dest": "/frontend/logo512.png"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/index.html"
     }
