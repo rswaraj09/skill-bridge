@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5001');
+const isProduction = process.env.NODE_ENV === 'production' || window.location.hostname.includes('vercel.app');
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || (isProduction ? '' : 'http://localhost:5001');
 export const API_URL = `${BACKEND_URL}/api`;
 export const API = API_URL;
 
