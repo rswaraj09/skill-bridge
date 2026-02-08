@@ -17,11 +17,13 @@ dotenv.config();
 
 const app = express();
 
-// Connect to MongoDB
-connectDB().catch(err => {
-  console.error('Failed to connect to MongoDB', err);
-  process.exit(1);
-});
+// Connect to MongoDB only when running locally
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  connectDB().catch(err => {
+    console.error('Failed to connect to MongoDB', err);
+    process.exit(1);
+  });
+}
 
 import passport from './config/passport.js'; // Import passport config
 
