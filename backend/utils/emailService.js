@@ -3,16 +3,26 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create transporter
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
+// Create transporter conditionally
+let transporter;
+
+try {
+    if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+        transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT,
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        });
+    } else {
+        console.warn('⚠️ SMTP credentials missing. Email service disabled.');
+    }
+} catch (error) {
+    console.error('Failed to create email transporter:', error);
+}
 
 /**
  * Send a notification email when a user logs in
@@ -21,6 +31,11 @@ const transporter = nodemailer.createTransport({
  */
 export const sendLoginEmail = async (to, name) => {
     try {
+        if (!transporter) {
+            console.log('⚠️ Email service not configured. Skipping login notification.');
+            return false;
+        }
+
         const mailOptions = {
             from: `"Skill Bridge" <${process.env.SMTP_USER}>`,
             to,
