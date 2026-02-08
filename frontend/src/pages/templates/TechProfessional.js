@@ -47,14 +47,16 @@ export default function TechProfessional() {
     }
   ]);
 
-  const [education, setEducation] = useState([
+  /* eslint-disable no-unused-vars */
+  const [education] = useState([
     { degree: 'BS Computer Science', school: 'UC Berkeley', year: '2019' }
   ]);
 
-  const [certifications, setCertifications] = useState([
+  const [certifications] = useState([
     'AWS Solutions Architect',
     'Kubernetes Certification'
   ]);
+  /* eslint-enable no-unused-vars */
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
@@ -63,12 +65,6 @@ export default function TechProfessional() {
       reader.onloadend = () => setProfilePhoto(reader.result);
       reader.readAsDataURL(file);
     }
-  };
-
-  const updateSkillPercentage = (index, value) => {
-    const newSkills = [...skills];
-    newSkills[index].percentage = Math.max(0, Math.min(100, value));
-    setSkills(newSkills);
   };
 
   const updateSkillName = (index, value) => {
@@ -81,8 +77,6 @@ export default function TechProfessional() {
   const removeSkill = (index) => setSkills(skills.filter((_, i) => i !== index));
   const addExperience = () => setExperiences([...experiences, { period: 'Start - End', title: 'Job Title', company: 'Company', location: 'Location', bullets: ['Achievement 1'] }]);
   const removeExperience = (index) => setExperiences(experiences.filter((_, i) => i !== index));
-  const addBullet = (expIndex) => { const newExps = [...experiences]; newExps[expIndex].bullets.push('Achievement'); setExperiences(newExps); };
-  const removeBullet = (expIndex, bulletIndex) => { const newExps = [...experiences]; newExps[expIndex].bullets = newExps[expIndex].bullets.filter((_, i) => i !== bulletIndex); setExperiences(newExps); };
 
   const handleDownloadPDF = async () => {
     const element = document.getElementById('resume-preview');
@@ -203,7 +197,7 @@ export default function TechProfessional() {
                   )}
                   <div className="flex-1 pt-2">
                     <h1 className="text-5xl font-bold text-cyan-400 mb-2 tracking-tight">{name}</h1>
-                    <h2 className="text-2xl text-gray-300">/* {title} */</h2>
+                    <h2 className="text-2xl text-gray-300">{'/* '}{title}{' */'}</h2>
                   </div>
                 </div>
 

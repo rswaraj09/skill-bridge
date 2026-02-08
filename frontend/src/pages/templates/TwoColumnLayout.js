@@ -10,8 +10,7 @@ export default function TwoColumnLayout() {
   const [summary, setSummary] = useState('Experienced Project Manager with 9+ years managing complex initiatives for tech and finance sectors. Expertise in Agile, Scrum, and Waterfall methodologies. Proven track record delivering projects on time and within budget.');
   const [phone, setPhone] = useState('+1 (555) 567-8901');
   const [email, setEmail] = useState('laura.stewart@email.com');
-  const [address, setAddress] = useState('Chicago, IL');
-  const [website, setWebsite] = useState('laurastewart.pm');
+  const [address] = useState('Chicago, IL');
   const [profilePhoto, setProfilePhoto] = useState(null);
 
   const [skills, setSkills] = useState([
@@ -43,12 +42,12 @@ export default function TwoColumnLayout() {
     }
   ]);
 
-  const [education, setEducation] = useState([
+  const [education] = useState([
     { degree: 'MBA Project Management', school: 'Northwestern Kellogg', year: '2017' },
     { degree: 'BS Business Administration', school: 'University of Illinois', year: '2015' }
   ]);
 
-  const [certifications, setCertifications] = useState([
+  const [certifications] = useState([
     'PMP - Project Management Professional',
     'CSM - Certified Scrum Master',
     'ITIL Foundation'
