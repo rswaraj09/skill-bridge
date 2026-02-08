@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Backend for Skill Bridge Resume Optimization App",
   "main": "server.js",
+  "engines": {
+    "node": "18.x"
+  },
   "type": "module",
   "scripts": {
     "start": "node server.js",

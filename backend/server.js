@@ -18,7 +18,10 @@ dotenv.config();
 const app = express();
 
 // Connect to MongoDB
-connectDB();
+connectDB().catch(err => {
+  console.error('Failed to connect to MongoDB', err);
+  process.exit(1);
+});
 
 import passport from './config/passport.js'; // Import passport config
 
