@@ -24,7 +24,7 @@ export const Navbar = ({ darkMode = true }) => {
     { to: '/interview-prep', label: 'Interview Prep', icon: <Brain className="w-4 h-4" /> },
     { to: '/rewrite', label: 'Rewrite', icon: <RefreshCw className="w-4 h-4" /> },
     { to: '/templates', label: 'Templates', icon: <Layout className="w-4 h-4" /> },
-    { to: '/templates', label: 'Templates', icon: <Layout className="w-4 h-4" /> },
+
     { to: '/jobs', label: 'Jobs', icon: <Briefcase className="w-4 h-4" /> },
     { to: '/history', label: 'History', icon: <Clock className="w-4 h-4" /> },
   ] : [];
@@ -121,9 +121,7 @@ export const Navbar = ({ darkMode = true }) => {
                     <Link to="/signup" onClick={() => setMobileOpen(false)}>
                       <Button className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-full font-heading">Get Started</Button>
                     </Link>
-                    <Link to="/signup" onClick={() => setMobileOpen(false)}>
-                      <Button className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-full font-heading">Get Started</Button>
-                    </Link>
+
                   </>
                 )}
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between">
