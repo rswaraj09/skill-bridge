@@ -228,4 +228,56 @@ router.get(
   (req, res) => handleSocialAuthCallback(req, res)
 );
 
+// @route   PUT /api/auth/updatepassword
+// @desc    Update user password
+// @access  Private
+router.put('/updatepassword', protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user._id).select('+password');
+
+    // Check current password
+    if (!(await user.matchPassword(currentPassword))) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect current password'
+      });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// @route   DELETE /api/auth/delete
+// @desc    Delete user account
+// @access  Private
+router.delete('/delete', protect, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user._id);
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully'
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 export default router;

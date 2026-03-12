@@ -14,7 +14,7 @@ export const generateQuestions = async (req, res) => {
                 content: `You are an expert technical interviewer.
                 
                 Instructions:
-                1. Generate exactly 30 interview questions for the provided domain (reduced count for better quality/complete response).
+                1. Generate exactly 10 interview questions for the provided domain (reduced count for better quality/complete response).
                 2. Structure the output as a STRICT JSON array of objects.
                 3. Each object MUST have exactly these two fields: "question" and "answer".
                 4. The "answer" should be a concise, correct explanation (2-3 sentences).
@@ -24,14 +24,14 @@ export const generateQuestions = async (req, res) => {
             },
             {
                 role: 'user',
-                content: `Generate 30 interview questions and answers for a ${domain}.`
+                content: `Generate 10 interview questions and answers for a ${domain}.`
             }
         ];
 
         const response = await axios.post(
             'https://openrouter.ai/api/v1/chat/completions',
             {
-                model: 'tngtech/deepseek-r1t2-chimera:free',
+                model: 'arcee-ai/trinity-large-preview:free',
                 messages: messages,
                 temperature: 0.7,
                 max_tokens: 4000
@@ -120,7 +120,7 @@ export const evaluateAnswer = async (req, res) => {
         const response = await axios.post(
             'https://openrouter.ai/api/v1/chat/completions',
             {
-                model: 'tngtech/deepseek-r1t2-chimera:free',
+                model: 'arcee-ai/trinity-large-preview:free',
                 messages: messages,
                 temperature: 0.3,
                 max_tokens: 1000

@@ -33,7 +33,7 @@ export const chatWithAI = async (req, res) => {
         const response = await axios.post(
             'https://openrouter.ai/api/v1/chat/completions',
             {
-                model: 'tngtech/deepseek-r1t2-chimera:free',
+                model: 'arcee-ai/trinity-large-preview:free',
                 messages: messages,
                 temperature: 0.7,
                 max_tokens: 1000
