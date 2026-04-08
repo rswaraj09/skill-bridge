@@ -45,6 +45,8 @@ export const authService = {
     return user ? JSON.parse(user) : null;
   },
   setUser: (user) => localStorage.setItem('user', JSON.stringify(user)),
+  updatePassword: (data) => api.put('/auth/updatepassword', data),
+  deleteAccount: () => api.delete('/auth/delete'),
 };
 
 export const resumeService = {
